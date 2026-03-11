@@ -1,0 +1,11 @@
+["0.1.0"]
+BowtieRisk = "f4857c2c-646e-44f8-8901-46c9ace85fa6"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DuckDB = "d2f5444f-75bc-4fdf-ac35-56f514c445e1"
+Exnovation = "eb535ea2-a284-4d5f-a499-9e884733dc08"
+GeoInterface = "cf35fbd7-0cd7-5166-be24-54bfbe79505f"
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+LibGEOS = "a90b1aa1-3769-5649-ba7e-abc5a9d163eb"
+PRComms = "2dde2a48-bffb-456d-9be4-0a16c25066d3"
+SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"

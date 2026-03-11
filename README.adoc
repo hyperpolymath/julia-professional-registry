@@ -1,0 +1,73 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= HyperpolymathRegistry
+Jonathan D. A. Jewell <j.d.a.jewell@open.ac.uk>
+:toc:
+
+== Overview
+
+Custom Julia package registry for all hyperpolymath Julia packages.
+
+== Usage
+
+Add the registry to your Julia installation:
+
+[source,julia]
+----
+using Pkg
+Pkg.Registry.add(RegistrySpec(url="https://github.com/hyperpolymath/HyperpolymathRegistry"))
+----
+
+Then install packages as usual:
+
+[source,julia]
+----
+pkg> add ZeroProb
+pkg> add Axiom
+pkg> add SMTLib
+----
+
+== Packages
+
+[cols="1,1,1", options="header"]
+|===
+| Package | Version | Description
+
+| AcceleratorGate | 0.1.0 | Unified accelerator abstraction layer
+| Axiology | 0.1.0 | Value theory and axiology modelling
+| Axiom | 1.0.0 | ML framework with formal verification
+| BowtieRisk | 0.1.0 | Bowtie risk analysis
+| Causals | 0.1.0 | Causal inference toolkit
+| Cladistics | 0.1.0 | Phylogenetic cladistic analysis
+| Cliodynamics | 0.1.0 | Mathematical modelling of historical dynamics
+| Cliometrics | 0.1.0 | Quantitative historical economics
+| Exnovation | 0.1.0 | Technology phase-out analysis
+| FirmwareAudit | 0.1.0 | Firmware integrity auditing
+| HackenbushGames | 0.1.0 | Combinatorial game theory (Hackenbush)
+| HardwareResilience | 0.1.0 | Hardware fault tolerance analysis
+| Hyperpolymath | 0.1.0 | Hyperpolymath ecosystem metapackage
+| InvestigativeJournalist | 0.1.0 | Data journalism toolkit
+| JuliaForChildren | 0.1.0 | Educational Julia for young learners
+| JuliaPackageSpitter | 0.1.0 | Julia package quality auditing
+| KnotTheory | 0.1.0 | Knot theory and invariants
+| Lithoglyph | 0.1.0 | Lithographic data processing
+| LowLevel | 0.1.0 | Low-level systems programming utilities
+| MacroPower | 0.1.0 | Advanced Julia metaprogramming
+| MinixSDK | 0.1.0 | MINIX operating system SDK
+| PolyglotFormalisms | 0.1.0 | Cross-language formal methods
+| PostDisciplinary | 0.1.0 | Post-disciplinary research tools
+| PRComms | 0.1.0 | Public relations communications analysis
+| ProvenCrypto | 0.1.0 | Formally verified cryptography
+| QuantumCircuit | 0.1.0 | Quantum circuit simulation
+| ShellIntegration | 0.1.0 | Shell integration utilities
+| SiliconCore | 0.1.0 | Silicon design and analysis
+| Skein | 0.1.0 | Skein hash function
+| SMTLib | 0.1.0 | SMT-LIB solver interface
+| SoftwareSovereign | 0.1.0 | Software sovereignty analysis
+| TradeUnionist | 0.1.0 | Labour rights data analysis
+| ViableSystems | 0.1.0 | Viable Systems Model (VSM) implementation
+| ZeroProb | 0.1.0 | Zero-probability event analysis
+|===
+
+== License
+
+PMPL-1.0-or-later

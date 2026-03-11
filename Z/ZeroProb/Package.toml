@@ -1,0 +1,3 @@
+name = "ZeroProb"
+uuid = "f9e8c2e0-8b4a-4d5f-9a3c-1e2d3c4b5a6f"
+repo = "https://github.com/hyperpolymath/ZeroProb.jl.git"

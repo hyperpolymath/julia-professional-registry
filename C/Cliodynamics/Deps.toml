@@ -1,0 +1,4 @@
+["1.0.0"]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"

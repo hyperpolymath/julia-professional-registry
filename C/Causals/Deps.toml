@@ -1,0 +1,5 @@
+["0.2.0"]
+AcceleratorGate = "59f742c7-270d-4a76-95d4-a853ae16cc71"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"

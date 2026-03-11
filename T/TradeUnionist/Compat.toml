@@ -1,0 +1,12 @@
+["0.1.0"]
+BowtieRisk = "1"
+DataFrames = "1"
+DuckDB = "1"
+Exnovation = "1"
+GeoInterface = "1"
+JSON3 = "1"
+LibGEOS = "0.8"
+PRComms = "0.1"
+SQLite = "1"
+StatsBase = "0.34"
+julia = "1.10"

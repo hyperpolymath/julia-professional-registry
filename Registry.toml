@@ -1,0 +1,43 @@
+name = "HyperpolymathRegistry"
+uuid = "2ba92a00-ca78-4729-9a29-51b4a830c8fa"
+repo = "https://github.com/hyperpolymath/HyperpolymathRegistry.git"
+
+description = """
+Hyperpolymath Julia package registry. Contains all hyperpolymath Julia packages.
+"""
+
+[packages]
+59f742c7-270d-4a76-95d4-a853ae16cc71 = { name = "AcceleratorGate", path = "A/AcceleratorGate" }
+868b87ec-ec5d-47a0-ab5f-c8a8ecbd97bd = { name = "Axiology", path = "A/Axiology" }
+bbd403f8-dcc5-405a-84eb-8de9d358675c = { name = "Axiom", path = "A/Axiom" }
+f4857c2c-646e-44f8-8901-46c9ace85fa6 = { name = "BowtieRisk", path = "B/BowtieRisk" }
+c4a8b6d2-f9e3-4c1a-b8d7-9f2e3c4d5e6f = { name = "Causals", path = "C/Causals" }
+e3663be0-4771-44aa-b6d0-43b3a6d82e58 = { name = "Cladistics", path = "C/Cladistics" }
+8d2f3e70-4c6b-5e9c-a3d1-2f8e9c0b1d2e = { name = "Cliodynamics", path = "C/Cliodynamics" }
+6c8e9c60-3b5a-4d8b-9f2a-1e7f8a9b0c1d = { name = "Cliometrics", path = "C/Cliometrics" }
+eb535ea2-a284-4d5f-a499-9e884733dc08 = { name = "Exnovation", path = "E/Exnovation" }
+e6a7b8c9-d0e1-4f2a-ab3c-4d5e6f7a8b9c = { name = "FirmwareAudit", path = "F/FirmwareAudit" }
+01ec8bc2-77c0-4797-a5fe-db76a6b99454 = { name = "HackenbushGames", path = "H/HackenbushGames" }
+d5f6a7b8-c9d0-4e1f-9a2b-3c4d5e6f7a8b = { name = "HardwareResilience", path = "H/HardwareResilience" }
+a0b1c2d3-e4f5-6a7b-8c9d-0e1f2a3b4c5d = { name = "Hyperpolymath", path = "H/Hyperpolymath" }
+379a7c0a-3675-4b32-b948-cb4760c6e442 = { name = "InvestigativeJournalist", path = "I/InvestigativeJournalist" }
+c1c96f90-3ae4-433d-aa60-06e66792fdf1 = { name = "JuliaForChildren", path = "J/JuliaForChildren" }
+772df90b-d426-497b-8682-0a765d4f8c0b = { name = "JuliaPackageSpitter", path = "J/JuliaPackageSpitter" }
+215268c9-7579-426e-8b7c-a3dc27acd339 = { name = "KnotTheory", path = "K/KnotTheory" }
+f1e2d3c4-b5a6-4b7c-8d9e-0f1a2b3c4d5e = { name = "Lithoglyph", path = "L/Lithoglyph" }
+a1b2c3d4-e5f6-4a1b-8c2d-3e4f5a6b7c8d = { name = "LowLevel", path = "L/LowLevel" }
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e = { name = "MacroPower", path = "M/MacroPower" }
+d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a = { name = "MinixSDK", path = "M/MinixSDK" }
+2dde2a48-bffb-456d-9be4-0a16c25066d3 = { name = "PRComms", path = "P/PRComms" }
+8fd979ee-625c-447d-87f1-33af4d789de5 = { name = "PolyglotFormalisms", path = "P/PolyglotFormalisms" }
+f1a9a0dc-9df1-4c08-8f01-4f9031796370 = { name = "PostDisciplinary", path = "P/PostDisciplinary" }
+33678010-b125-405f-b046-d17447b3c4c1 = { name = "ProvenCrypto", path = "P/ProvenCrypto" }
+b3d4e5f6-a7b8-4c9d-ae0f-1a2b3c4d5e6f = { name = "QuantumCircuit", path = "Q/QuantumCircuit" }
+7d3f9a2c-8b4e-5c1f-a6d0-9e8f7b2c3d4e = { name = "SMTLib", path = "S/SMTLib" }
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f = { name = "ShellIntegration", path = "S/ShellIntegration" }
+c4e5f6a7-b8c9-4d0e-8f1a-2b3c4d5e6f7a = { name = "SiliconCore", path = "S/SiliconCore" }
+e8a1f3d0-7c42-4e9a-b5d1-3a7f8c2e1d0b = { name = "Skein", path = "S/Skein" }
+cc72cefe-1ea1-4255-93cd-1af1078aa475 = { name = "SoftwareSovereign", path = "S/SoftwareSovereign" }
+28827ff7-c05d-49d1-8ea0-4ff47f2d6875 = { name = "TradeUnionist", path = "T/TradeUnionist" }
+a6c07668-559f-42e4-88f9-b00ef4c02498 = { name = "ViableSystems", path = "V/ViableSystems" }
+f9e8c2e0-8b4a-4d5f-9a3c-1e2d3c4b5a6f = { name = "ZeroProb", path = "Z/ZeroProb" }

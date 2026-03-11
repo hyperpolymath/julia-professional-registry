@@ -1,0 +1,3 @@
+name = "ProvenCrypto"
+uuid = "33678010-b125-405f-b046-d17447b3c4c1"
+repo = "https://github.com/hyperpolymath/ProvenCrypto.jl.git"

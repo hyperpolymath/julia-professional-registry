@@ -1,0 +1,3 @@
+name = "Cliometrics"
+uuid = "6c8e9c60-3b5a-4d8b-9f2a-1e7f8a9b0c1d"
+repo = "https://github.com/hyperpolymath/Cliometrics.jl.git"

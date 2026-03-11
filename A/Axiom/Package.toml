@@ -1,0 +1,3 @@
+name = "Axiom"
+uuid = "bbd403f8-dcc5-405a-84eb-8de9d358675c"
+repo = "https://github.com/hyperpolymath/Axiom.jl.git"

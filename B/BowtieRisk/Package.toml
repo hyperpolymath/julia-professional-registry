@@ -1,0 +1,3 @@
+name = "BowtieRisk"
+uuid = "f4857c2c-646e-44f8-8901-46c9ace85fa6"
+repo = "https://github.com/hyperpolymath/BowtieRisk.jl.git"

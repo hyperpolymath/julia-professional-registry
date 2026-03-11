@@ -1,0 +1,5 @@
+["0.1.0"]
+AcceleratorGate = "0.1"
+HardwareResilience = "0.1"
+SiliconCore = "0.1"
+julia = "1.10"
