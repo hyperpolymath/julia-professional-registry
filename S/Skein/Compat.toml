@@ -2,7 +2,6 @@
 AcceleratorGate = "0.1"
 DBInterface = "2"
 Dates = "1"
- = []
 SQLite = "1"
 UUIDs = "1"
 julia = "1"

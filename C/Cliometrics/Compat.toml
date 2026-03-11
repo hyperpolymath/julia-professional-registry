@@ -3,5 +3,4 @@ AcceleratorGate = "0.1"
 CSV = "0.10"
 DataFrames = "1"
 Statistics = "1"
- = []
 julia = "1"

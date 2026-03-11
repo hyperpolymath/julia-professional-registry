@@ -1,6 +1,5 @@
 ["1.0.1"]
 AMDGPU = "1"
 CUDA = "5"
- = []
 KernelAbstractions = "0.9"
 Metal = "1"
