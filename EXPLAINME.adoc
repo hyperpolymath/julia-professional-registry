@@ -1,24 +1,172 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = HyperpolymathRegistry — Show Me The Receipts
 :toc:
+:toclevels: 3
 :icons: font
 
-The README makes claims. This file backs them up.
+The README makes claims about a custom Julia package registry. This file traces
+the registry wire format, shows how a consumer adds it, and maps every
+directory to its role.
+
+== Claims from the README
 
 [quote, README]
 ____
-Jonathan D. A. Jewell <j.d.a.jewell@open.ac.uk>
+Custom Julia package registry for all hyperpolymath Julia packages.
+Add the registry with:
+`Pkg.Registry.add(RegistrySpec(url="https://github.com/hyperpolymath/HyperpolymathRegistry"))`
 ____
+
+*How it works.* Julia's `Pkg` system discovers packages through local registry
+directories that follow the `General` registry layout. Each registry has a
+`Registry.toml` file at its root declaring a UUID, name, repo URL, description,
+and a `[packages]` table mapping each package UUID to its `{name, path}`. The
+`path` field points to a single-letter subdirectory (e.g. `A/Axiom`), which
+contains four TOML files: `Package.toml` (UUID + repo), `Versions.toml`
+(git-tree-sha1 per version), `Compat.toml` (compatibility bounds), and
+`Deps.toml` (declared dependencies). When a user calls
+`Pkg.Registry.add(RegistrySpec(url=...))`, Julia clones this repo and uses it
+as an index to resolve `pkg> add PackageName` to a git-tree-sha1 and repo URL.
+
+*Honest caveat.* All 34 registered packages are at version 0.1.0 (or 1.0.0 for
+Axiom), reflecting the fact that most are early-stage. The UUIDs in
+`Registry.toml` must stay stable forever — a UUID change breaks all existing
+manifests in consumer projects. No automated UUID collision check is currently
+wired into CI.
+
+*Critical path.* `Registry.toml` `[packages]` table → `A/Axiom/Package.toml`
+(package UUID + repo URL) → `A/Axiom/Versions.toml` (git-tree-sha1 per
+version) → `A/Axiom/Compat.toml` (Julia + dep compat bounds) →
+`A/Axiom/Deps.toml` (declared runtime dependencies).
+
+[quote, README]
+____
+Contains 34 packages including Axiom (ML framework with formal verification),
+ProvenCrypto (formally verified cryptography), SMTLib (SMT-LIB solver
+interface), and ViableSystems (Viable Systems Model implementation).
+____
+
+*How it works.* The single-letter subdirectory layout mirrors the `General`
+registry. Letters A through Z contain subdirectories named after packages.
+Each package's `Compat.toml` specifies which Julia stdlib/external package
+versions are compatible. For example, Axiom's `Compat.toml` declares
+compatibility with `HTTP = "1.10.19"`, `JSON3 = "1.14.3"`,
+`Zygote = "0.6"`, and `julia = "1"` — meaning it only resolves cleanly on
+Julia 1.x with those exact lower bounds.
+
+*Honest caveat.* Compat bounds are currently minimal. Several packages list
+only `julia = "1"` with no upper bound, which means they would not automatically
+block resolution against a hypothetical future Julia 2.x. This is a known
+maintenance gap.
+
+*Critical path.* `pkg> add Axiom` → Julia resolves via `A/Axiom/Versions.toml`
+→ checks compat in `A/Axiom/Compat.toml` → clones from
+`https://github.com/hyperpolymath/Axiom.jl.git` at the recorded sha1.
+
+== How It Is Checked
+
+[source,bash]
+----
+deno test --allow-read tests/
+----
+
+The test suite in `tests/` validates registry structural invariants:
+each package directory must contain all four required TOML files; every UUID
+in `Registry.toml` must correspond to a real `Package.toml`; the
+`git-tree-sha1` values in `Versions.toml` must be plausible 40-character hex
+strings.
+
+CI additionally runs the standard RSR workflow suite including TruffleHog
+secret scanning and EditorConfig enforcement.
+
+== Dogfooded Across The Account
+
+[cols="2,3", options="header"]
+|===
+| Consumer | How it uses this repo
+
+| `developer-ecosystem` (julia-ecosystem)
+| The Julia ecosystem segment uses HyperpolymathRegistry as the canonical
+  source for all hyperpolymath Julia packages; the Justfile recipes in
+  `developer-ecosystem/julia-ecosystem/` include `Pkg.Registry.add` as a
+  setup step.
+
+| `HyperpolymathRegistry` consumers (all Julia projects)
+| Any hyperpolymath Julia package (Axiom, ProvenCrypto, SMTLib, ViableSystems,
+  ZeroProb, etc.) that lists `[compat]` entries relies on this registry for
+  resolution. Adding a new version to a package requires a corresponding
+  `Versions.toml` entry here.
+
+| `gitbot-fleet` (sustainabot)
+| sustainabot's version-bump workflow opens PRs against this registry whenever
+  a registered package tags a new release on GitHub.
+
+| `hypatia-scan.yml`
+| Registry integrity check (UUID uniqueness, TOML parse) is included in
+  the Hypatia CI rule set run against this repo.
+|===
 
 == File Map
 
-[cols="1,2"]
+[cols="2,3", options="header"]
 |===
 | Path | What's There
 
-| `test(s)/` | Test suite
+| `Registry.toml`
+| Root registry manifest. UUID: `2ba92a00-ca78-4729-9a29-51b4a830c8fa`.
+  Contains `name`, `repo`, `description`, and a `[packages]` table with
+  34 entries mapping package UUID → `{name, path}`.
+
+| `A/` through `Z/`
+| Single-letter index directories. Each subdirectory is a registered package.
+  Populated letters: A, B, C, E, F, H, I, J, K, L, M, P, Q, S, T, V, Z.
+
+| `<Letter>/<Package>/Package.toml`
+| Package UUID and upstream GitHub repo URL.
+
+| `<Letter>/<Package>/Versions.toml`
+| `["x.y.z"] git-tree-sha1 = "..."` — one entry per published version.
+
+| `<Letter>/<Package>/Compat.toml`
+| `["x.y.z"]` section with dependency compat bounds (Julia stdlib and
+  external packages). Axiom's entry is the most complete example.
+
+| `<Letter>/<Package>/Deps.toml`
+| Runtime dependency UUIDs. Absent for packages with no dependencies.
+
+| `<Letter>/<Package>/WeakDeps.toml`
+| Weak/optional dependency declarations (present in Axiom; absent elsewhere).
+
+| `tests/`
+| Deno test suite for registry structural validation.
+
+| `Justfile`
+| `just` task runner with `default`, `doctor`, `tour`, `help-me` recipes.
+
+| `deno.json` / `deno.lock`
+| Deno runtime config and lockfile.
+
+| `guix.scm` / `flake.nix`
+| Reproducible build environment declarations.
+
+| `contractiles/`
+| Contractile recipe stubs (RSR standard).
+
+| `0-AI-MANIFEST.a2ml`
+| AI agent manifest (entry point for AI tooling).
+
+| `CONTRIBUTING.adoc` / `CONTRIBUTING.md`
+| How to add a new package or version to the registry.
+
+| `SECURITY.md`
+| Vulnerability reporting policy.
+
+| `LICENSE` / `LICENSES/`
+| PMPL-1.0-or-later full text and licence metadata.
 |===
 
 == Questions?
 
-Open an issue or reach out directly — happy to explain anything in more detail.
+Open an issue on GitHub or reach out to Jonathan D.A. Jewell
+<j.d.a.jewell@open.ac.uk> — happy to explain anything in more detail.
