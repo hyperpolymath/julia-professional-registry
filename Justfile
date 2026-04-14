@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: PMPL-1.0-or-later
 # Justfile — UX recipes
 
+import? "contractile.just"
+
 import? 'contractile.just'
 
 # Default: list recipes
