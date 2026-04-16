@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: PMPL-1.0-or-later
-= HyperpolymathRegistry
+= julia-professional-registry
 Jonathan D. A. Jewell <j.d.a.jewell@open.ac.uk>
 :toc:
 
@@ -14,7 +14,7 @@ Add the registry to your Julia installation:
 [source,julia]
 ----
 using Pkg
-Pkg.Registry.add(RegistrySpec(url="https://github.com/hyperpolymath/HyperpolymathRegistry"))
+Pkg.Registry.add(RegistrySpec(url="https://github.com/hyperpolymath/julia-professional-registry"))
 ----
 
 Then install packages as usual:
