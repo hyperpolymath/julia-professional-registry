@@ -27,9 +27,12 @@ jobs:
           repository: hyperpolymath/ddraig-ssg
           path: .ddraig-ssg
       - name: Compile Ddraig
+        # Best-effort: a failed Idris build must not stop the repo publishing.
+        continue-on-error: true
         working-directory: .ddraig-ssg
         run: idris2 Ddraig.idr -o ddraig
       - name: Build site
+        continue-on-error: true
         run: |
           mkdir -p src
           if [ ! -f src/index.md ] && [ -f README.md ]; then
@@ -38,6 +41,32 @@ jobs:
             echo "# ${GITHUB_REPOSITORY}" > src/index.md
           fi
           ./.ddraig-ssg/build/exec/ddraig build src _site https://hyperpolymath.github.io/${GITHUB_REPOSITORY#*/}
+      - name: Overlay the canonical www bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Publish the canonical bundle alongside whatever the SSG produced.
+          #
+          #   www/public/      -> the servable site root, used as a fallback
+          #   www/.well-known/ -> must be reachable at /.well-known/ on this
+          #                       origin (RFC 9116, and RSR check
+          #                       www/.well-known/security.txt)
+          #
+          # Everything else under www/ (dns/, policies/, profiles/, runbooks/,
+          # errors/) is source material and is deliberately NOT published, so
+          # only these two subtrees are copied rather than all of www/.
+          mkdir -p _site
+          # -n (no-clobber): a page the SSG did produce always wins, so the
+          # bundle can never regress a working site. It only fills the gaps.
+          if [ -d www/public ]; then
+            cp -an www/public/. _site/
+          fi
+          if [ -d www/.well-known ]; then
+            mkdir -p _site/.well-known
+            cp -a www/.well-known/. _site/.well-known/
+          fi
+          echo "published tree:"
+          find _site -maxdepth 2 | sort
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5.0.0
         with:
