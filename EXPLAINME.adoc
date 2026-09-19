@@ -156,7 +156,7 @@ secret scanning and EditorConfig enforcement.
 | `0-AI-MANIFEST.a2ml`
 | AI agent manifest (entry point for AI tooling).
 
-| `CONTRIBUTING.adoc` / `CONTRIBUTING.md`
+| `.github/CONTRIBUTING.md` / `CONTRIBUTING.md`
 | How to add a new package or version to the registry.
 
 | `SECURITY.md`
