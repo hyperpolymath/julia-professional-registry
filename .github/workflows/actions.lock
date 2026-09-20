@@ -5,11 +5,6 @@ version: 'v0.0.2'
 workflows:
     '.github/workflows/boj-build.yml':
         - 'actions/checkout@v7.0.1'
-    '.github/workflows/casket-pages.yml':
-        - 'actions/checkout@v7.0.1'
-        - 'actions/configure-pages@v6.0.0'
-        - 'actions/deploy-pages@v5.0.1'
-        - 'actions/upload-pages-artifact@v5.0.0'
     '.github/workflows/codeql.yml':
         - 'actions/checkout@v7.0.1'
         - 'github/codeql-action@v4.38.0'
@@ -35,11 +30,6 @@ dependencies:
         commit: 'sha1-3d3c42e5aac5ba805825da76410c181273ba90b1'
         owner_id: 44036562
         repo_id: 197814629
-    'actions/configure-pages@v6.0.0':
-        ref: 'v6.0.0'
-        commit: 'sha1-45bfe0192ca1faeb007ade9deae92b16b8254a0d'
-        owner_id: 44036562
-        repo_id: 513659658
     'actions/deploy-pages@v5.0.1':
         ref: 'v5.0.1'
         commit: 'sha1-368f82528645a54fb793d4d04e342629a3f51346'
