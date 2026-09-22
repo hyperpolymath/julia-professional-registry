@@ -151,8 +151,8 @@ FNR == 1 { wf = FILENAME }
 {
   line = $0
   sub(/[[:space:]]+#.*$/, "", line)              # strip trailing comment
-  if (match(line, /^[[:space:]]*-?[[:space:]]*uses:[[:space:]]*(.+)$/, m)) {
-    raw = m[1]
+  if (match(line, /^[[:space:]]*-?[[:space:]]*(uses|"uses"|'uses')[[:space:]]*:[[:space:]]*(.+)$/, m)) {
+    raw = m[2]
     gsub(/^["']|["']$/, "", raw)
     gsub(/[[:space:]]+$/, "", raw)
     n = norm(raw)
