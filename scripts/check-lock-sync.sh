@@ -201,8 +201,8 @@ END {
     #     to dependencies: records in THIS lockfile.
     #
     # Failing on an absent job-level ref also steers the developer into the fatal
-    # state: gh actions-lock will not backfill job-level refs, so the only way to
-    # go green was to hand-add a workflows: entry with no dependencies: record -
+    # state: gh actions-lock will not backfill job-level refs, so the only way
+    # to go green was to hand-add a workflows: entry with no dependencies: record -
     # which is precisely the dangling edge clause 3 exists to catch.
     nu = split(steplist[wf], u, " ")
     delete uniq; missing = ""
@@ -219,8 +219,8 @@ END {
       bad = 1
     }
 
-    # Job-level reusable refs: reported, never fatal. If one IS locked, clause 3
-    # still requires its callee graph to be closed.
+    # Job-level reusable refs are mandatory. If one IS locked, clause 3 still
+    # requires its callee graph to be closed.
     njm = split(joblist[wf], v, " ")
     delete juniq; jmissing = ""
     for (j = 1; j <= njm; j++) {
@@ -228,7 +228,10 @@ END {
       juniq[v[j]] = 1
       if (!((key SUBSEP ck(v[j])) in lock)) jmissing = jmissing " " v[j]
     }
-    if (jmissing != "") jnote = jnote sprintf("\n  %s:%s", key, jmissing)
+    if (jmissing != "") {
+      printf "FAIL %s\n     job-level reusable-workflow refs missing from the lockfile:%s\n", key, jmissing
+      bad = 1
+    }
 
     # --- clause 2: every lock entry must be referenced by this workflow ---
     orphan = ""
