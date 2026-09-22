@@ -8,6 +8,7 @@ CHECK="$REPO_ROOT/scripts/check-lock-sync.sh"
 TMP_ROOT="$(mktemp -d)"
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
+# Write the workflow fixture shared by the passing and missing-reference cases.
 write_workflow() {
   local workflow_dir="$1"
 
