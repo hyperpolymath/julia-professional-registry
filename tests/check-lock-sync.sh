@@ -23,7 +23,7 @@ jobs:
       - 'uses': owner/single-quoted@v1
       - "uses": owner/double-quoted@v1
       - uses   : owner/spaced-colon@v1
-      - uses: $/path/to/local-action@v1
+      - uses: $/path/to/local-action
 YAML
 }
 
