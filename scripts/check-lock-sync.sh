@@ -77,8 +77,8 @@ if [ "${#WORKFLOWS[@]}" -eq 0 ]; then
 fi
 
 read -r -d '' PROG <<'AWK' || true
-# Return owner/repo@ref for a supported external `uses:` value, dropping any
-# action or reusable-workflow subpath. Return "" for local or unparseable values.
+# Reduce an external `uses:` value to owner/repository@ref, discarding any
+# subpath. Return "" for local values or values without an owner/repository@ref.
 function norm(r,   at, path, ref, n, parts) {
   at = 0
   for (n = length(r); n > 0; n--) { if (substr(r, n, 1) == "@") { at = n; break } }
@@ -90,10 +90,8 @@ function norm(r,   at, path, ref, n, parts) {
   return parts[1] "/" parts[2] "@" ref
 }
 
-# Return a comparison key by lowercasing everything before the final "@" while
-# preserving the ref. Without an "@", lowercase the entire value.
-# GitHub resolves owner and repository names case-insensitively; this behaviour is
-# measured rather than assumed:
+# Fold case on the OWNER/REPO segment only, for comparison keys. GitHub resolves
+# owner and repository names case-insensitively, and this is measured, not assumed:
 # metadatastician/pong-ping's lockfile records sonarsource/sonarqube-scan-action@v8.2.1
 # while sonarqube.yml says SonarSource/..., and at commit cd5f90f that workflow ran
 # SUCCESS while codeql.yml at the SAME commit was startup_failure. A same-commit
@@ -153,8 +151,8 @@ FNR == 1 { wf = FILENAME }
 {
   line = $0
   sub(/[[:space:]]+#.*$/, "", line)              # strip trailing comment
-  if (match(line, /^[[:space:]]*-?[[:space:]]*uses:[[:space:]]*(.+)$/, m)) {
-    raw = m[1]
+  if (match(line, /^[[:space:]]*-?[[:space:]]*(uses|"uses"|'uses')[[:space:]]*:[[:space:]]*(.+)$/, m)) {
+    raw = m[2]
     gsub(/^["']|["']$/, "", raw)
     gsub(/[[:space:]]+$/, "", raw)
     n = norm(raw)
@@ -203,8 +201,8 @@ END {
     #     to dependencies: records in THIS lockfile.
     #
     # Failing on an absent job-level ref also steers the developer into the fatal
-    # state: gh actions-lock will not backfill job-level refs, so the only way to
-    # go green was to hand-add a workflows: entry with no dependencies: record -
+    # state: gh actions-lock will not backfill job-level refs, so the only way
+    # to go green was to hand-add a workflows: entry with no dependencies: record -
     # which is precisely the dangling edge clause 3 exists to catch.
     nu = split(steplist[wf], u, " ")
     delete uniq; missing = ""
@@ -221,8 +219,8 @@ END {
       bad = 1
     }
 
-    # Job-level reusable refs: reported, never fatal. If one IS locked, clause 3
-    # still requires its callee graph to be closed.
+    # Job-level reusable refs are mandatory. If one IS locked, clause 3 still
+    # requires its callee graph to be closed.
     njm = split(joblist[wf], v, " ")
     delete juniq; jmissing = ""
     for (j = 1; j <= njm; j++) {
@@ -230,7 +228,10 @@ END {
       juniq[v[j]] = 1
       if (!((key SUBSEP ck(v[j])) in lock)) jmissing = jmissing " " v[j]
     }
-    if (jmissing != "") jnote = jnote sprintf("\n  %s:%s", key, jmissing)
+    if (jmissing != "") {
+      printf "FAIL %s\n     job-level reusable-workflow refs missing from the lockfile:%s\n", key, jmissing
+      bad = 1
+    }
 
     # --- clause 2: every lock entry must be referenced by this workflow ---
     orphan = ""
