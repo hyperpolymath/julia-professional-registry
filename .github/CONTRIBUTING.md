@@ -103,8 +103,9 @@ unsigned pushes. Estate policy:
   as a *signing* key (`gpg.format=ssh`, `user.signingkey=<key>.pub`,
   `commit.gpgsign=true`). The committer email must be verified on that account.
 - **Apps, bots and workflows** never `git push` local commits. They write
-  through the API (`createCommitOnBranch` or the estate `signed-push` action)
-  so that GitHub signs each commit.
+  through the API (`createCommitOnBranch` or the estate `signed-push` action).
+  `createCommitOnBranch` signs commits only when GitHub supports signing for
+  the authenticated credential.
 - Merge PRs with **squash**. The ruleset checks every commit on the PR branch,
   not just the result, so one unsigned commit blocks the merge. Re-create such a
   branch with signed commits (`git cherry-pick -S`) and open a new PR.
