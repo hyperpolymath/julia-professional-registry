@@ -1,0 +1,4 @@
+name = "MaridStorage"
+uuid = "01a115b9-7cf4-8463-9dfb-224e0c6ab613"
+repo = "https://github.com/metadatastician/marid.git"
+subdir = "packages/MaridStorage"

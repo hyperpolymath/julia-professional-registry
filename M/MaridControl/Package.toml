@@ -1,0 +1,4 @@
+name = "MaridControl"
+uuid = "01a115b1-6b89-8bc1-b693-306d1d0301d5"
+repo = "https://github.com/metadatastician/marid.git"
+subdir = "packages/MaridControl"

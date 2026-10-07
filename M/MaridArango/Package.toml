@@ -1,0 +1,4 @@
+name = "MaridArango"
+uuid = "01a115ae-6523-8273-8497-753822252d6a"
+repo = "https://github.com/metadatastician/marid.git"
+subdir = "packages/MaridArango"
