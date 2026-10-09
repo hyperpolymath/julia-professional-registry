@@ -1,0 +1,4 @@
+name = "MaridTransport"
+uuid = "01a115ba-7f33-8545-9989-732142b76ec2"
+repo = "https://github.com/metadatastician/marid.git"
+subdir = "packages/MaridTransport"

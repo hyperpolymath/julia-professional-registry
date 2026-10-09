@@ -30,11 +30,11 @@
 #        (a) every package's Deps.toml name<->UUID pairs agree with the
 #            Registry.toml binding for that name, across every package that
 #            depends on another registry-local package;
-#        (b) Registry.toml's own `repo` field is a hyperpolymath slug that
-#            agrees with `git remote get-url origin` (compared slug-only,
-#            because sandboxes may rewrite the remote through a local
-#            proxy), and every package's Package.toml `repo` field is a
-#            slug owned by one of PACKAGE_SLUG_OWNERS (ADR 0003);
+#        (b) Registry.toml's `repo` field host/slug agrees with each
+#            package's own Package.toml `repo` field and with
+#            `git remote get-url origin` (compared as an OWNER/<repo>
+#            slug, because sandboxes may rewrite the remote through a local
+#            proxy);
 #        (c) warn (do not fail) on Compat.toml entries that only specify a
 #            lower bound with no upper bound -- the estate wants
 #            upper-bounded compat everywhere.
@@ -52,10 +52,22 @@ using Test
 
 const REPO_ROOT = abspath(get(ARGS, 1, joinpath(@__DIR__, "..")))
 const REGISTRY_TOML = joinpath(REPO_ROOT, "Registry.toml")
-# The registry itself lives in one org. Packages may live in either of the
-# owner's two orgs (ADR 0003); any other owner is still a hard failure.
-const REGISTRY_SLUG_OWNER = "hyperpolymath"
-const PACKAGE_SLUG_OWNERS = ("hyperpolymath", "metadatastician")
+const EXPECTED_SLUG_OWNER = "hyperpolymath"
+# Owners a package's Package.toml `repo` may point at. The registry itself
+# lives under EXPECTED_SLUG_OWNER; packages may also live in the estate's
+# metadatastician organisation (e.g. the Marid monorepo, D54/D321). The set
+# is closed: adding an owner takes an ADR (docs/decisions/0003-…).
+const ALLOWED_PACKAGE_OWNERS = (EXPECTED_SLUG_OWNER, "metadatastician")
+
+"""
+    allowed_package_owner(slug) -> Bool
+
+Return `true` when the GitHub `OWNER/REPO` slug `slug` names one of the
+`ALLOWED_PACKAGE_OWNERS`. The owner comparison is exact and case-sensitive,
+matching how the slug is written in Package.toml.
+"""
+allowed_package_owner(slug::AbstractString) =
+    any(owner -> startswith(slug, "$(owner)/"), ALLOWED_PACKAGE_OWNERS)
 
 # RegistryCI must be `using`'d at top level (not loaded dynamically inside a
 # function via Base.require) -- doing it inside a function hits a Julia
@@ -234,8 +246,9 @@ end
 """
     extract_github_slug(url) -> Union{String,Nothing}
 
-Return the `OWNER/REPO` GitHub slug that `url` names, or `nothing` if it
-names none.
+Return the `OWNER/REPO` GitHub slug named by the repository URL `url`, or
+`nothing` when `url` is not recognisably a GitHub (or proxy-rewritten GitHub)
+remote.
 """
 function extract_github_slug(url::AbstractString)
     # Handles https://github.com/OWNER/REPO(.git)?, git@github.com:OWNER/REPO.git,
@@ -253,22 +266,14 @@ function extract_github_slug(url::AbstractString)
 end
 
 """
-    slug_owner(slug) -> SubString
-
-Return the owner part of an `OWNER/REPO` slug.
-"""
-slug_owner(slug::AbstractString) = first(split(slug, '/'))
-
-"""
     check_repo_slug!(findings, reg, root)
 
-(b) Registry.toml's own `repo` field must point at a
-`REGISTRY_SLUG_OWNER/<something>` GitHub slug. Every package's Package.toml
-`repo` field must point at a slug owned by one of `PACKAGE_SLUG_OWNERS`
-(ADR 0003). Where `git remote get-url origin` is available, also compare the
-registry slug against it -- but only the `OWNER/REPO` slug portion, since
-sandboxes may rewrite the remote through a local proxy (e.g.
-http://local_proxy@127.0.0.1:NNNN/git/...).
+(b) Registry.toml's own `repo` field, and every package's Package.toml `repo`
+field, must point at a GitHub slug: Registry.toml at `hyperpolymath/<something>`,
+each package at an owner in `ALLOWED_PACKAGE_OWNERS`. Where
+`git remote get-url origin` is available, also compare against it -- but only
+the `hyperpolymath/<repo>` slug portion, since sandboxes may rewrite the
+remote through a local proxy (e.g. http://local_proxy@127.0.0.1:NNNN/git/...).
 """
 function check_repo_slug!(findings::Findings, reg, root::AbstractString)
     banner("Layer 2b: Registry.toml / Package.toml repo slug consistency")
@@ -280,10 +285,10 @@ function check_repo_slug!(findings::Findings, reg, root::AbstractString)
         slug = extract_github_slug(registry_repo)
         if slug === nothing
             err!(findings, "Registry.toml repo field \"$registry_repo\" is not a recognisable GitHub slug")
-        elseif slug_owner(slug) != REGISTRY_SLUG_OWNER
-            err!(findings, "Registry.toml repo field resolves to slug \"$slug\", expected owner \"$REGISTRY_SLUG_OWNER\"")
+        elseif !startswith(slug, "$(EXPECTED_SLUG_OWNER)/")
+            err!(findings, "Registry.toml repo field resolves to slug \"$slug\", expected owner \"$EXPECTED_SLUG_OWNER\"")
         else
-            println("Registry.toml repo -> slug \"$slug\" (owner matches \"$REGISTRY_SLUG_OWNER\")")
+            println("Registry.toml repo -> slug \"$slug\" (owner matches \"$EXPECTED_SLUG_OWNER\")")
         end
     end
 
@@ -309,9 +314,8 @@ function check_repo_slug!(findings::Findings, reg, root::AbstractString)
         println("(no git remote 'origin' resolvable here; skipping remote-vs-Registry.toml comparison)")
     end
 
-    # Per-package repo field sanity: must exist, must resolve to a slug owned
-    # by one of PACKAGE_SLUG_OWNERS.
-    allowed = join(("\"$o\"" for o in PACKAGE_SLUG_OWNERS), " or ")
+    # Per-package repo field sanity: must exist, must resolve to a slug owned by
+    # one of ALLOWED_PACKAGE_OWNERS.
     mismatches = 0
     for (_uuid, data) in reg["packages"]
         name = data["name"]
@@ -326,9 +330,9 @@ function check_repo_slug!(findings::Findings, reg, root::AbstractString)
         slug = extract_github_slug(repo)
         if slug === nothing
             err!(findings, "$name: Package.toml repo \"$repo\" is not a recognisable GitHub slug")
-        elseif !(slug_owner(slug) in PACKAGE_SLUG_OWNERS)
+        elseif !allowed_package_owner(slug)
             mismatches += 1
-            err!(findings, "$name: Package.toml repo resolves to slug \"$slug\", expected owner $allowed")
+            err!(findings, "$name: Package.toml repo resolves to slug \"$slug\", expected an owner in $(ALLOWED_PACKAGE_OWNERS)")
         end
     end
     println("Checked repo field on $(length(reg["packages"])) package Package.toml files ($mismatches owner mismatches).")

@@ -7,12 +7,15 @@
 * Status: proposed (accepted when the BDFL merges the PR that carries it)
 * Date: 2026-10-09
 * Deciders: BDFL (Jonathan D.A. Jewell). Ruling of 2026-10-09: admit
-  `metadatastician` as a package owner, in its own PR and ADR
+  `metadatastician` as a package owner, recorded in its own ADR
+* Implemented by: PR #109 (commit `7c52894`), which registered the Marid
+  Tier-1 packages and widened the check in the same change. This ADR
+  records that decision after the fact; it changes no code.
 
 == Context
 
-`ci/validate.jl` Layer 2b (ADR 0001) fails any package whose
-`Package.toml` `repo` field resolves to a GitHub slug not owned by
+`ci/validate.jl` Layer 2b (ADR 0001) failed any package whose
+`Package.toml` `repo` field resolved to a GitHub slug not owned by
 `hyperpolymath`. `docs/REGISTRY-POLICY.adoc` § "Name / UUID immutability"
 gives the reason: a foreign owner there is either a typo or a package copied
 from a fork without updating its provenance.
@@ -21,27 +24,24 @@ The owner keeps work in two GitHub organisations, `hyperpolymath` and
 `metadatastician`. Some packages belong in the second. Marid and its
 satellite packages are the first case: the owner ruled that their
 repositories transfer to `metadatastician` (ruling D54-A on
-`hyperpolymath/standards#787`). Registering any of them here would fail
-Layer 2b, even though the owner is the same person and the provenance is
-correct.
+`hyperpolymath/standards#787`).
 
-The owner has also ruled that the Marid Tier-1 Julia packages register in
-this registry now, with one owner-chosen package going to General later
-(ruling D321, 2026-10-07, which takes stage 1 of D67-A on
-`hyperpolymath/marid#21`). Their UUIDs are re-minted as UUIDv8 profile T
-before they are registered (D322). Under the current check none of those
-packages can be registered: the unpatched `ci/validate.jl` reports one owner
-mismatch for each of them.
+The owner also ruled that the Marid Tier-1 Julia packages register in this
+registry now, with one owner-chosen package going to General later (ruling
+D321, 2026-10-07, which takes stage 1 of D67-A on `hyperpolymath/marid#21`).
+Their UUIDs were re-minted as UUIDv8 profile T before registration (D322).
+Under the old check none of them could be registered: it reported one owner
+mismatch for each of the nine packages.
 
 == Decision
 
 1. Layer 2b accepts a package `repo` slug owned by `hyperpolymath` or
    `metadatastician`. `ci/validate.jl` holds the set as
-   `PACKAGE_SLUG_OWNERS`.
+   `ALLOWED_PACKAGE_OWNERS` and tests it with `allowed_package_owner`.
 2. The set is closed. Any other owner is still a hard failure, and adding
    an organisation takes another ADR.
 3. Registry.toml's own top-level `repo` field still has to be a
-   `hyperpolymath` slug (`REGISTRY_SLUG_OWNER`). That field names where this
+   `hyperpolymath` slug (`EXPECTED_SLUG_OWNER`). That field names where this
    registry lives, which is one place, and it is also compared with
    `git remote get-url origin`. The ruling widens which packages may live
    here, not where the registry lives, so this check is not loosened.
@@ -62,14 +62,14 @@ mismatch for each of them.
 == Consequences
 
 * Packages whose repositories live in `metadatastician` can be registered
-  here once their other checks pass. This ADR registers none. The Marid
-  Tier-1 packages are registered in their own PR, which depends on this one.
+  here once their other checks pass. The nine Marid Tier-1 packages are the
+  first, registered by PR #109.
 * A typo or a fork owner outside the two organisations still fails CI as
-  before. The error message names both allowed owners.
-* Nothing that is registered today changes. Every current package is
-  `hyperpolymath`-owned, and Layer 2b reports the same result on `main`.
-* The `check_repo_slug!` docstring, which used to sit above
-  `extract_github_slug`, is moved onto the function it describes.
+  before. The error names the allowed owners.
+* Every package registered before PR #109 is `hyperpolymath`-owned, so
+  Layer 2b reports the same result for them as it did before.
+* `docs/REGISTRY-POLICY.adoc` and the comment on `ALLOWED_PACKAGE_OWNERS`
+  state that the set is closed and point here.
 
 '''
 

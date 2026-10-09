@@ -21,6 +21,16 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 === Added
 
+* Registry: the nine Marid Tier-1 packages at `+v0.1.0+` from the
+`+metadatastician/marid+` monorepo (`+subdir = "packages/<Pkg>"+`,
+commit `+fd139f7+`): `+MaridArango+`, `+MaridCodec+`, `+MaridControl+`,
+`+MaridCRDT+`, `+MaridIR+`, `+MaridLive+`, `+MaridRaft+`,
+`+MaridStorage+`, `+MaridTransport+` — total 41 registered packages.
+`+ci/validate.jl+` Layer 2b now admits package repos owned by
+`+metadatastician+` as well as `+hyperpolymath+`.
+* `+docs/decisions/0003-package-repos-in-metadatastician.adoc+` —
+records the Layer 2b widening above as a decision, and closes the set of
+allowed package owners: adding an organisation takes an ADR.
 * Registry: `+EchoTypes v0.1.0+` (PR #16) and `+v0.2.0+` (PR #20);
 `+KRLAdapter v0.1.0+` (PR #16); `+ViperPkg v0.1.0+` (PR #18) — total 37
 registered packages.
@@ -47,11 +57,6 @@ the reusable’s canonical caller block; fixes `+startup_failure+`
 regression introduced in PR #17 (PR #19).
 * Consolidate `+CONTRIBUTING.md+` and `+CONTRIBUTING.adoc+` into a
 single canonical Markdown file (PR #19).
-* `+ci/validate.jl+` Layer 2b now also accepts a package `+repo+` owned
-by `+metadatastician+`, the owner's second organisation. The registry's
-own `+repo+` field must still be `+hyperpolymath+`, and any other owner
-still fails
-(`+docs/decisions/0003-package-repos-in-metadatastician.adoc+`).
 
 === Removed
 

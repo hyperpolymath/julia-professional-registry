@@ -1,0 +1,4 @@
+name = "MaridCodec"
+uuid = "01a115b0-6977-8194-b1bb-ba277a2ddf75"
+repo = "https://github.com/metadatastician/marid.git"
+subdir = "packages/MaridCodec"
