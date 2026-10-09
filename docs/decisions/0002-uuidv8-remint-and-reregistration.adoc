@@ -1,0 +1,163 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Owner: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= ADR 0002: Re-mint ten placeholder package UUIDs as UUIDv8 and re-register them
+:toc: preamble
+
+* Status: proposed (accepted when the BDFL merges the PR that carries it)
+* Date: 2026-10-09
+* Deciders: BDFL (Jonathan D.A. Jewell). Rulings of 2026-10-07 (estate
+  UUIDv8, ruling D320), 2026-10-08 (re-mint and re-register the registered
+  packages, at a patch bump, under ADR-008 profile T) and 2026-10-09
+  (InvestigativeJournalist, SMTLib)
+
+== Context
+
+Ten of the 32 packages in `Registry.toml` were registered under UUIDs that
+were typed by hand as placeholders, not drawn at random. They are runs of
+consecutive hex digits, for example `d5f6a7b8-c9d0-4e1f-9a2b-3c4d5e6f7a8b`.
+A census on 2026-10-07 counted the sequential-hex runs in every UUID in
+the registry. The ten below scored 3 to 6. Every other entry scored 2 or
+less. One of them, ShellIntegration's `c3d4e5f6-a7b8-4c9d-0e1f-…`, also
+carries the variant nibble `0`. That is the reserved NCS variant, not the
+RFC 9562 variant `10xx`.
+
+A UUID is the join key every `Deps.toml` uses (`docs/REGISTRY-POLICY.adoc`
+§ "Name / UUID immutability"). A placeholder is unique only as long as no
+other template copies the same pattern. The estate's UUID standard is now
+UUIDv8 (ADR-008 in `hyperpolymath/standards`, made strict by ruling D320).
+On 2026-10-08 the owner ruled that the registered packages are not exempt
+from that standard and must be re-minted and re-registered.
+
+Policy has three rules that bear on this change:
+
+* a UUID, once registered, is permanent;
+* `Versions.toml` is additive-only;
+* an edit to a UUID binding is treated as a removal plus a new
+  registration, needs BDFL review and an ADR, and never auto-merges.
+
+This ADR is that record.
+
+One more package is affected without being a placeholder.
+InvestigativeJournalist 0.1.0 (`379a7c0a-3675-4b32-b948-cb4760c6e442`)
+declares dependencies on the old Causals and ZeroProb UUIDs.
+`ci/validate.jl` Layer 2a keys `Registry.toml` by name. A `Deps.toml` that
+binds `Causals` to its old UUID therefore fails once `Causals` is
+rebound, and so would a second entry for the same name. The entry cannot
+stay. Its upstream repository was also renamed to InvestigativeJournalism
+(module included, upstream commit `98ccf6b`). Policy says a rename takes a
+new UUID, so the package returns as a new registration.
+
+== Decision
+
+1. For each of the ten packages in the table below:
+** remove the old UUID binding and every version registered under it;
+** register the package again under a fresh UUIDv8 (ADR-008 profile T),
+   with the same name and the same registry path;
+** the new version is a patch bump of the last registered version. Each
+   package repository bumped its own `Project.toml` in a merged PR.
+2. Remove InvestigativeJournalist (`I/InvestigativeJournalist`, 0.1.0).
+   Register InvestigativeJournalism 0.1.1 as a new package at
+   `I/InvestigativeJournalism`, under a fresh UUIDv8.
+3. Generate every new entry with RegistryTools v2.4.3, the library
+   Registrator uses: `update_package_file`, `update_versions_file`,
+   `check_deps!`, `update_deps_file`, `check_compat!` and
+   `update_compat_file`. Generate it from the `Project.toml` at the
+   registered commit, so `Deps.toml` and `Compat.toml` come out exactly as
+   Registrator would write them. One input is filtered before generation
+   because it cannot resolve: placeholder weak dependencies whose UUIDs
+   name no package. SMTLib 0.2.1 declares nine, `11111111-1111-…` through
+   `99999999-9999-…`, and they are left out of its `WeakDeps.toml`. A
+   second guard drops compat entries for undeclared names. It fired for
+   no package. Generation is idempotent: a second run over the result
+   changes nothing.
+4. The old versions are **removed, not carried over**. Their source trees
+   declare the old UUID in their own `Project.toml`. Registering them under
+   the new UUID would make the registry contradict the package source.
+5. The deprecation trail is this ADR and the `CHANGELOG.adoc` entry. It
+   cannot live in the old `Registry.toml` entries, which have to go: an old
+   entry kept beside the new one would put two packages under one name.
+   Layer 2a rejects that, and `pkg> add <name>` would become ambiguous.
+
+[cols="2,4,1,4,1,3",options="header"]
+|===
+| Package | Old UUID (removed) | Old version | New UUID | New version | Registered tree (`git-tree-sha1`)
+
+| HardwareResilience | `d5f6a7b8-c9d0-4e1f-9a2b-3c4d5e6f7a8b` | 0.1.0 | `01a11d29-d880-869f-9c60-029824b42355` | 0.1.1 | `23c4d8377b1eb85386ee3c7bad6f4b98b88cdcea`
+| SiliconCore | `c4e5f6a7-b8c9-4d0e-8f1a-2b3c4d5e6f7a` | 0.1.0 | `01a11d29-d88c-832a-9ded-976af4b7dc75` | 0.1.1 | `6992b47447b96b6b27dce17e23849bf9515a514d`
+| ZeroProb | `f9e8c2e0-8b4a-4d5f-9a3c-1e2d3c4b5a6f` | 0.1.0 | `01a11d29-d894-81ed-be3f-5f3acc80d59a` | 0.1.1 | `c5629bbb028c20aa7e139c5adb5dd2e393c87ff4`
+| Causals | `c4a8b6d2-f9e3-4c1a-b8d7-9f2e3c4d5e6f` | 0.2.0 | `01a11d29-d897-8383-92d8-041d500f9c95` | 0.2.1 | `0267c0294d687907c186b7a0442235f3170b9c1f`
+| QuantumCircuit | `b3d4e5f6-a7b8-4c9d-ae0f-1a2b3c4d5e6f` | 0.1.0 | `01a11d29-d887-80e0-8c2e-f313792966ce` | 0.1.1 | `80d80561ac91d8df1bfaa36abe47229dd31699b4`
+| ShellIntegration | `c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f` | 0.1.0 | `01a11d29-d88a-8008-a50a-9fff81f51eb4` | 0.1.1 | `a06f3eb77763938b43aec58d3d206aeca9caf437`
+| FirmwareAudit | `e6a7b8c9-d0e1-4f2a-ab3c-4d5e6f7a8b9c` | 0.1.0 | `01a11d29-d88f-83f4-a10e-468e4f4e9669` | 0.1.1 | `4833940472c2f5f3057b922595ff6ad1d9b5c082`
+| ViperPkg | `d7e4f8a0-5c3b-4d9e-8f2a-1b3c4d5e6f7a` | 0.1.0 | `01a11d29-d892-8715-80a7-7aa80ffa7099` | 0.1.1 | `d235b723a950c2d97f6d44a3b1ea0d33e6159e7c`
+| SMTLib | `7d3f9a2c-8b4e-5c1f-a6d0-9e8f7b2c3d4e` | 0.2.0 | `01a11d29-d89a-86da-8e3a-553d114a3537` | 0.2.1 | `05a805f35b2b6f235e0d0585c58d594a3f2b219e`
+| LowLevel | `a1b2c3d4-e5f6-4a1b-8c2d-3e4f5a6b7c8d` | 0.1.0 | `01a11d29-d884-82e8-9db2-8ff667f451ca` | 0.1.1 | `c25242f6485f978c9c180290ed7182c3ed98f607`
+| InvestigativeJournalist -> InvestigativeJournalism | `379a7c0a-3675-4b32-b948-cb4760c6e442` | 0.1.0 | `01a11de2-b9d3-80b4-b616-640df22918c0` | 0.1.1 | `6e624d2077ca172390591328e5faaf894c2b0d21`
+|===
+
+ViperPkg is registered from the `viper-pkg` subdirectory of
+`hyperpolymath/jtv-lang`. Its `Package.toml` `repo` moves from the old
+`julia-the-viper` URL to the repository's current name.
+
+Each new version registers the package's default branch at its version
+bump commit; it does not register the old tree under a new UUID (item 4).
+It therefore carries every change merged since the version this registry
+held before. Diffed between the two registered trees:
+
+* each package changed 88 to 219 files, almost all of them estate CI,
+  documentation and metadata scaffolding. ViperPkg changed 2 files;
+* Julia source (`src/**/*.jl`) changed in at most 19 files and gained at
+  most 83 lines in any one package;
+* no line beginning with `export` changed in any package except Causals.
+  Causals removes no exported name and adds three: `counterfactual`,
+  `twin_network` and `probability_of_necessity_and_sufficiency`;
+* ZeroProb, Causals, SMTLib and InvestigativeJournalism also drop their
+  non-Julia `src/abi/*.idr` scaffold.
+
+Pkg's compatibility rules treat a `0.y.z` patch bump as non-breaking. The
+measured changes fit that, so the owner's patch-bump ruling stands.
+
+== Alternatives considered
+
+* *Exempt the registered packages and keep their UUIDs.* Rejected by the
+  owner on 2026-10-08. The placeholders are exactly the identifiers that
+  ruling D320 was made to retire.
+* *Keep the old entries beside the new ones as a deprecation trail.*
+  Rejected. Two entries would share one name, Layer 2a would fail, and
+  `pkg> add <name>` would become ambiguous.
+* *Re-register the same version numbers under the new UUIDs.* Rejected by
+  the owner, who ruled a patch bump. One version number would otherwise
+  name two different trees in this registry's history.
+* *Keep the name InvestigativeJournalist.* Rejected. The upstream package
+  and module are now InvestigativeJournalism, and a registry name must
+  match the package's own `Project.toml`.
+
+== Consequences
+
+* **Existing installs break once.** A Manifest that pins an old UUID no
+  longer resolves against this registry. The fix is `Pkg.rm` and then
+  `Pkg.add` of the same name. InvestigativeJournalist users add
+  `InvestigativeJournalism` instead.
+* The two registered dependents move in this same change: LowLevel now
+  depends on the new HardwareResilience and SiliconCore UUIDs, and
+  InvestigativeJournalism on the new Causals and ZeroProb UUIDs. No registry
+  metadata file (`Registry.toml` or any `*/*/*.toml`) references any of
+  the eleven retired UUIDs any more. Only this ADR and the changelog name
+  them.
+* The removed versions remain recoverable from this repository's git
+  history and from each package's own history. They are not installable
+  from the registry.
+* This merges only after each registered tree exists on its package's
+  default branch. SMTLib's tree comes from `hyperpolymath/SMTLib.jl#48`,
+  which fixes two load errors and the CI pin. InvestigativeJournalism's
+  comes from `hyperpolymath/InvestigativeJournalism.jl#78`. If either
+  squash commit's tree differs from the table, regenerate that entry
+  first.
+* Release tags (`v0.1.1`, `v0.2.1`, and `ViperPkg-v0.1.1` for the subdir
+  package) are cut at the registered commits after this merges.
+
+'''
+
+Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath). Licensed under
+CC-BY-SA-4.0.
