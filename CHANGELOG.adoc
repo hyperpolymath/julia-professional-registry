@@ -35,6 +35,9 @@ commit `+fd139f7+`): `+MaridArango+`, `+MaridCodec+`, `+MaridControl+`,
 `+MaridStorage+`, `+MaridTransport+` — total 41 registered packages.
 `+ci/validate.jl+` Layer 2b now admits package repos owned by
 `+metadatastician+` as well as `+hyperpolymath+`.
+* `+docs/decisions/0003-package-repos-in-metadatastician.adoc+` —
+records the Layer 2b widening above as a decision, and closes the set of
+allowed package owners: adding an organisation takes an ADR.
 * Registry: `+EchoTypes v0.1.0+` (PR #16) and `+v0.2.0+` (PR #20);
 `+KRLAdapter v0.1.0+` (PR #16); `+ViperPkg v0.1.0+` (PR #18) — total 37
 registered packages.

@@ -64,7 +64,9 @@ and to `Registry.toml` itself, across every package registered in `Registry.toml
   organisation (`ci/validate.jl` Layer 2b, `ALLOWED_PACKAGE_OWNERS`). This is
   a hard failure, not a warning -- a foreign owner in that field is either a
   typo or a sign the package was copied from a fork without updating
-  provenance.
+  provenance. The set of allowed package owners is closed: adding an
+  organisation takes an ADR
+  (link:decisions/0003-package-repos-in-metadatastician.adoc[ADR 0003]).
 
 == What may auto-merge vs what needs BDFL review
 

@@ -55,7 +55,8 @@ const REGISTRY_TOML = joinpath(REPO_ROOT, "Registry.toml")
 const EXPECTED_SLUG_OWNER = "hyperpolymath"
 # Owners a package's Package.toml `repo` may point at. The registry itself
 # lives under EXPECTED_SLUG_OWNER; packages may also live in the estate's
-# metadatastician organisation (e.g. the Marid monorepo, D54/D321).
+# metadatastician organisation (e.g. the Marid monorepo, D54/D321). The set
+# is closed: adding an owner takes an ADR (docs/decisions/0003-…).
 const ALLOWED_PACKAGE_OWNERS = (EXPECTED_SLUG_OWNER, "metadatastician")
 
 """
