@@ -22,7 +22,7 @@ workflows:
         - 'actions/deploy-pages@v5.0.1'
         - 'actions/upload-pages-artifact@v5.0.0'
     '.github/workflows/push-email-notify.yml':
-        - 'hyperpolymath/smtp-notify-action@v0.3.0'
+        - 'hyperpolymath/smtp-notify-action@v0.5.0'
     '.github/workflows/registry-validate.yml':
         - 'actions/checkout@v7.0.1'
         - 'julia-actions/setup-julia@v3.0.2'
@@ -98,9 +98,9 @@ dependencies:
         commit: 'sha1-db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28'
         owner_id: 9919
         repo_id: 259445878
-    'hyperpolymath/smtp-notify-action@v0.3.0':
-        ref: 'v0.3.0'
-        commit: 'sha1-22e7bdb322c430c1d0dac6b3bb307f4bb139d0be'
+    'hyperpolymath/smtp-notify-action@v0.5.0':
+        ref: 'v0.5.0'
+        commit: 'sha1-c1c9fa07992a02c1fd3d67a0dc1b08cccb852aef'
         owner_id: 6759885
         repo_id: 1352485172
     'hyperpolymath/standards@84355587cb2a1f86e6882de83514a32db2646e7a':
