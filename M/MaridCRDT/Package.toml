@@ -1,0 +1,4 @@
+name = "MaridCRDT"
+uuid = "01a115af-6777-83e7-bbf4-4312fe84fb45"
+repo = "https://github.com/metadatastician/marid.git"
+subdir = "packages/MaridCRDT"

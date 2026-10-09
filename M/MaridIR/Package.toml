@@ -1,0 +1,4 @@
+name = "MaridIR"
+uuid = "01a115b4-723a-8911-b469-7c18b764c41a"
+repo = "https://github.com/metadatastician/marid.git"
+subdir = "packages/MaridIR"
