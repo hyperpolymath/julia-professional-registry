@@ -100,6 +100,24 @@ ViperPkg is registered from the `viper-pkg` subdirectory of
 `hyperpolymath/jtv-lang`. Its `Package.toml` `repo` moves from the old
 `julia-the-viper` URL to the repository's current name.
 
+Each new version registers the package's default branch at its version
+bump commit; it does not register the old tree under a new UUID (item 4).
+It therefore carries every change merged since the version this registry
+held before. Diffed between the two registered trees:
+
+* each package changed 88 to 219 files, almost all of them estate CI,
+  documentation and metadata scaffolding. ViperPkg changed 2 files;
+* Julia source (`src/**/*.jl`) changed in at most 19 files and gained at
+  most 83 lines in any one package;
+* no line beginning with `export` changed in any package except Causals.
+  Causals removes no exported name and adds three: `counterfactual`,
+  `twin_network` and `probability_of_necessity_and_sufficiency`;
+* ZeroProb, Causals, SMTLib and InvestigativeJournalism also drop their
+  non-Julia `src/abi/*.idr` scaffold.
+
+Pkg's compatibility rules treat a `0.y.z` patch bump as non-breaking. The
+measured changes fit that, so the owner's patch-bump ruling stands.
+
 == Alternatives considered
 
 * *Exempt the registered packages and keep their UUIDs.* Rejected by the
