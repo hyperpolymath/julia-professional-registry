@@ -65,6 +65,15 @@ pkg> add SMTLib
 | Lithoglyph | 0.1.0 | Lithographic data processing
 | LowLevel | 0.1.1 | Low-level systems programming utilities
 | MacroPower | 0.1.0 | Advanced Julia metaprogramming
+| MaridArango | 0.1.0 | Native Julia HTTP client for ArangoDB (Marid storage set)
+| MaridCodec | 0.1.0 | Marid wire codec (JSON3) and HTTP content negotiation
+| MaridControl | 0.1.0 | Marid control plane: snapshot config swaps, append-only logs, changefeeds
+| MaridCRDT | 0.1.0 | State-based CRDTs for Marid cluster presence and replicated state
+| MaridIR | 0.1.0 | Canonical intermediate representation for the Marid framework
+| MaridLive | 0.1.0 | HTML-first reactive helpers (HTMX, Turbo Streams, Datastar) over SSE/WebSocket
+| MaridRaft | 0.1.0 | Native Julia Raft consensus: leader election, log replication, quorum
+| MaridStorage | 0.1.0 | Marid storage seam: get/put/query/transaction/cursor/watch
+| MaridTransport | 0.1.0 | Marid transport layer: HTTP/1.1, SSE, gRPC and gRPC-Web framing, Connect
 | MinixSDK | 0.1.0 | MINIX operating system SDK
 | PolyglotFormalisms | 0.1.0 | Cross-language formal methods
 | PostDisciplinary | 0.1.0 | Post-disciplinary research tools

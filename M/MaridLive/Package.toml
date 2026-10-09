@@ -1,0 +1,4 @@
+name = "MaridLive"
+uuid = "01a115b5-7479-8d82-a0d2-d2a681675e27"
+repo = "https://github.com/metadatastician/marid.git"
+subdir = "packages/MaridLive"

@@ -26,6 +26,15 @@ c1c96f90-3ae4-433d-aa60-06e66792fdf1 = { name = "JuliaForChildren", path = "J/Ju
 215268c9-7579-426e-8b7c-a3dc27acd339 = { name = "KnotTheory", path = "K/KnotTheory" }
 28b5845d-d150-4ffa-a60e-3b762afb26c8 = { name = "KRLAdapter", path = "K/KRLAdapter" }
 01a11d29-d884-82e8-9db2-8ff667f451ca = { name = "LowLevel", path = "L/LowLevel" }
+01a115ae-6523-8273-8497-753822252d6a = { name = "MaridArango", path = "M/MaridArango" }
+01a115b0-6977-8194-b1bb-ba277a2ddf75 = { name = "MaridCodec", path = "M/MaridCodec" }
+01a115b1-6b89-8bc1-b693-306d1d0301d5 = { name = "MaridControl", path = "M/MaridControl" }
+01a115af-6777-83e7-bbf4-4312fe84fb45 = { name = "MaridCRDT", path = "M/MaridCRDT" }
+01a115b4-723a-8911-b469-7c18b764c41a = { name = "MaridIR", path = "M/MaridIR" }
+01a115b5-7479-8d82-a0d2-d2a681675e27 = { name = "MaridLive", path = "M/MaridLive" }
+01a115b8-7a8a-8f24-baaa-cf06974b0145 = { name = "MaridRaft", path = "M/MaridRaft" }
+01a115b9-7cf4-8463-9dfb-224e0c6ab613 = { name = "MaridStorage", path = "M/MaridStorage" }
+01a115ba-7f33-8545-9989-732142b76ec2 = { name = "MaridTransport", path = "M/MaridTransport" }
 2dde2a48-bffb-456d-9be4-0a16c25066d3 = { name = "PRComms", path = "P/PRComms" }
 8fd979ee-625c-447d-87f1-33af4d789de5 = { name = "PolyglotFormalisms", path = "P/PolyglotFormalisms" }
 f1a9a0dc-9df1-4c08-8f01-4f9031796370 = { name = "PostDisciplinary", path = "P/PostDisciplinary" }

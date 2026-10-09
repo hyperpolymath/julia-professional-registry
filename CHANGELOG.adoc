@@ -28,6 +28,13 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 * `+docs/decisions/0002-uuidv8-remint-and-reregistration.adoc+` —
 records the re-mint and re-registration below, and is their deprecation
 trail.
+* Registry: the nine Marid Tier-1 packages at `+v0.1.0+` from the
+`+metadatastician/marid+` monorepo (`+subdir = "packages/<Pkg>"+`,
+commit `+fd139f7+`): `+MaridArango+`, `+MaridCodec+`, `+MaridControl+`,
+`+MaridCRDT+`, `+MaridIR+`, `+MaridLive+`, `+MaridRaft+`,
+`+MaridStorage+`, `+MaridTransport+` — total 41 registered packages.
+`+ci/validate.jl+` Layer 2b now admits package repos owned by
+`+metadatastician+` as well as `+hyperpolymath+`.
 * Registry: `+EchoTypes v0.1.0+` (PR #16) and `+v0.2.0+` (PR #20);
 `+KRLAdapter v0.1.0+` (PR #16); `+ViperPkg v0.1.0+` (PR #18) — total 37
 registered packages.
