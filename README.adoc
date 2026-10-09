@@ -47,23 +47,23 @@ pkg> add SMTLib
 | Axiology | 0.1.0 | Value theory and axiology modelling
 | Axiom | 1.0.0 | ML framework with formal verification
 | BowtieRisk | 0.1.0 | Bowtie risk analysis
-| Causals | 0.1.0 | Causal inference toolkit
+| Causals | 0.2.1 | Causal inference toolkit
 | Cladistics | 0.1.0 | Phylogenetic cladistic analysis
 | Cliodynamics | 0.1.0 | Mathematical modelling of historical dynamics
 | Cliometrics | 0.1.0 | Quantitative historical economics
 | EchoTypes | 0.2.0 | Echo-types runtime — companion to the nextgen-languages Echo type system
 | Exnovation | 0.1.0 | Technology phase-out analysis
-| FirmwareAudit | 0.1.0 | Firmware integrity auditing
+| FirmwareAudit | 0.1.1 | Firmware integrity auditing
 | HackenbushGames | 0.1.0 | Combinatorial game theory (Hackenbush)
-| HardwareResilience | 0.1.0 | Hardware fault tolerance analysis
+| HardwareResilience | 0.1.1 | Hardware fault tolerance analysis
 | Hyperpolymath | 0.1.0 | Hyperpolymath ecosystem metapackage
-| InvestigativeJournalism | 0.1.0 | Data journalism toolkit
+| InvestigativeJournalism | 0.1.1 | Data journalism toolkit
 | JuliaForChildren | 0.1.0 | Educational Julia for young learners
 | JuliaPackageSpitter | 0.1.0 | Julia package quality auditing
 | KnotTheory | 0.1.0 | Knot theory and invariants
 | KRLAdapter | 0.1.0 | Knowledge Representation Layer adapter
 | Lithoglyph | 0.1.0 | Lithographic data processing
-| LowLevel | 0.1.0 | Low-level systems programming utilities
+| LowLevel | 0.1.1 | Low-level systems programming utilities
 | MacroPower | 0.1.0 | Advanced Julia metaprogramming
 | MaridArango | 0.1.0 | Native Julia HTTP client for ArangoDB (Marid storage set)
 | MaridCodec | 0.1.0 | Marid wire codec (JSON3) and HTTP content negotiation
@@ -79,16 +79,16 @@ pkg> add SMTLib
 | PostDisciplinary | 0.1.0 | Post-disciplinary research tools
 | PRComms | 0.1.0 | Public relations communications analysis
 | ProvenCrypto | 0.1.0 | Formally verified cryptography
-| QuantumCircuit | 0.1.0 | Quantum circuit simulation
-| ShellIntegration | 0.1.0 | Shell integration utilities
-| SiliconCore | 0.1.0 | Silicon design and analysis
+| QuantumCircuit | 0.1.1 | Quantum circuit simulation
+| ShellIntegration | 0.1.1 | Shell integration utilities
+| SiliconCore | 0.1.1 | Silicon design and analysis
 | Skein | 0.1.0 | Skein hash function
-| SMTLib | 0.1.0 | SMT-LIB solver interface
+| SMTLib | 0.2.1 | SMT-LIB solver interface
 | SoftwareSovereign | 0.1.0 | Software sovereignty analysis
 | TradeUnionism | 0.1.0 | Labour rights data analysis
 | ViableSystems | 0.1.0 | Viable Systems Model (VSM) implementation
-| ViperPkg | 0.1.0 | Julia bindings for the `julia-the-viper` Viper language
-| ZeroProb | 0.1.0 | Zero-probability event analysis
+| ViperPkg | 0.1.1 | Julia bindings for the `julia-the-viper` Viper language
+| ZeroProb | 0.1.1 | Zero-probability event analysis
 |===
 
 == License

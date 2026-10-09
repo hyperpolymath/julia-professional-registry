@@ -21,6 +21,13 @@ https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 === Added
 
+* Registry: `+InvestigativeJournalism v0.1.1+`, a new package under UUIDv8
+`+01a11de2-b9d3-80b4-b616-640df22918c0+`. It replaces
+`+InvestigativeJournalist+`, whose upstream was renamed
+(`+docs/decisions/0002-uuidv8-remint-and-reregistration.adoc+`).
+* `+docs/decisions/0002-uuidv8-remint-and-reregistration.adoc+` —
+records the re-mint and re-registration below, and is their deprecation
+trail.
 * Registry: the nine Marid Tier-1 packages at `+v0.1.0+` from the
 `+metadatastician/marid+` monorepo (`+subdir = "packages/<Pkg>"+`,
 commit `+fd139f7+`): `+MaridArango+`, `+MaridCodec+`, `+MaridControl+`,
@@ -49,6 +56,15 @@ Governance, Roadmap, Security) + `+_Sidebar+` (PR #19).
 
 === Changed
 
+* *Breaking for existing installs:* ten packages are re-registered under
+fresh UUIDv8 identifiers, each at a patch bump: `+HardwareResilience+`,
+`+SiliconCore+`, `+ZeroProb+`, `+QuantumCircuit+`, `+ShellIntegration+`,
+`+FirmwareAudit+`, `+ViperPkg+` and `+LowLevel+` at `+0.1.1+`;
+`+Causals+` and `+SMTLib+` at `+0.2.1+`. Their old UUIDs were hand-typed
+placeholders. A Manifest that pins one no longer resolves: run
+`+Pkg.rm+` and then `+Pkg.add+` of the same name. ADR 0002 has the
+old-to-new UUID table. `+ViperPkg+`'s repo URL moves to
+`+hyperpolymath/jtv-lang+`.
 * `+.github/workflows/governance.yml+` — SHA-pin the standards
 governance reusable (was floating `+@main+`) (PR #17).
 * `+.github/workflows/scorecard.yml+` — job-level
@@ -60,6 +76,13 @@ single canonical Markdown file (PR #19).
 
 === Removed
 
+* Registry: `+InvestigativeJournalist v0.1.0+`
+(`+379a7c0a-3675-4b32-b948-cb4760c6e442+`). Its dependencies named the
+retired Causals and ZeroProb UUIDs. Use `+InvestigativeJournalism+`.
+* Registry: every version registered under the ten retired placeholder
+UUIDs (`+0.1.0+`, or `+0.2.0+` for Causals and SMTLib). Those versions'
+own `+Project.toml+` files declare the old UUID, so they are not carried
+across (ADR 0002).
 * `+.machine_readable/STATE.a2ml+` (root) — moved to canonical
 `+.machine_readable/6a2/STATE.a2ml+` per estate structural-drift policy
 (PR #17).
