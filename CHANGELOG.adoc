@@ -47,6 +47,11 @@ the reusable’s canonical caller block; fixes `+startup_failure+`
 regression introduced in PR #17 (PR #19).
 * Consolidate `+CONTRIBUTING.md+` and `+CONTRIBUTING.adoc+` into a
 single canonical Markdown file (PR #19).
+* `+ci/validate.jl+` Layer 2b now also accepts a package `+repo+` owned
+by `+metadatastician+`, the owner's second organisation. The registry's
+own `+repo+` field must still be `+hyperpolymath+`, and any other owner
+still fails
+(`+docs/decisions/0003-package-repos-in-metadatastician.adoc+`).
 
 === Removed
 

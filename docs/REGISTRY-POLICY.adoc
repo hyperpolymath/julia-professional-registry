@@ -14,7 +14,7 @@ link:../ci/validate.jl[`ci/validate.jl`].
 == Scope
 
 Applies to every change under a package directory (`<Letter>/<PackageName>/`)
-and to `Registry.toml` itself, across all 37 packages currently registered.
+and to `Registry.toml` itself, across every package registered in `Registry.toml`.
 
 == Semver bump rules
 
@@ -58,11 +58,14 @@ and to `Registry.toml` itself, across all 37 packages currently registered.
 * A package's *name* is effectively permanent too: renaming requires a new
   UUID (a "new package" in Pkg's model) plus a deprecation trail in the old
   entry, not an in-place rename of `Registry.toml`.
-* Registry.toml's own `repo` field, and every package's `Package.toml` `repo`
-  field, must resolve to a `hyperpolymath/<name>` GitHub slug (`ci/validate.jl`
-  Layer 2b). This is a hard failure, not a warning -- a foreign owner in that
-  field is either a typo or a sign the package was copied from a fork without
-  updating provenance.
+* Registry.toml's own `repo` field must resolve to a `hyperpolymath/<name>`
+  GitHub slug, because the registry itself lives there. Every package's
+  `Package.toml` `repo` field must resolve to a slug owned by one of the
+  owner's two organisations, `hyperpolymath` or `metadatastician`
+  (`ci/validate.jl` Layer 2b, ADR 0003). Both are hard failures, not
+  warnings. Any other owner in that field is either a typo or a sign the
+  package was copied from a fork without updating provenance. The allowed set
+  is closed: adding an organisation takes an ADR.
 
 == What may auto-merge vs what needs BDFL review
 
