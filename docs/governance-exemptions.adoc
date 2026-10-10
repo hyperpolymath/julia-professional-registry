@@ -1,0 +1,53 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Governance check exemptions
+:toc:
+
+This file records every governance check that is not fully evaluated in this
+repository, with its reason, its compensating control, its owner and a review
+date. An entry here is a documented decision. It is not a mute: no check is
+removed from a workflow, demoted to a warning, or marked `continue-on-error`.
+
+== Live Actions-policy check (advisory without a credential)
+
+[cols="1,4",options="header"]
+|===
+| Field | Value
+
+| Check
+| `governance / Live Actions policy (credentialed advisory)`, from standards
+  `governance-reusable.yml` at pin `ed5e3f65`.
+
+| Status
+| Not evaluated while `HYPATIA_SCAN_PAT` is not provisioned. The step emits a
+  `::notice` and exits 0 by the standards design.
+
+| Reason
+| The live check reads the repository's Administration endpoints
+  (`repos/{owner}/{repo}/actions/permissions`). The ordinary `GITHUB_TOKEN`
+  cannot read them. The repository does not hold `HYPATIA_SCAN_PAT`, and the
+  owner has not yet provisioned it.
+
+| Compensating control
+| The separate tree allowlist gate (`Allowlist Preflight`) still runs and
+  blocks on any uncovered third-party `uses:` reference. It is not
+  exempted.
+
+| Owner
+| Repository owner (`hyperpolymath`).
+
+| Review date
+| 2026-11-10. Revisit earlier if the secret is provisioned.
+
+| Closure path
+| Provision a token that can read Administration, add it as
+  `HYPATIA_SCAN_PAT`, and explicitly map
+  `HYPATIA_SCAN_PAT: ${{ secrets.HYPATIA_SCAN_PAT }}` under
+  `jobs.governance.secrets` in the caller workflow
+  (`.github/workflows/governance.yml`). Only after that mapping is present
+  and a `main` run confirms the live check reads the policy may this entry
+  be deleted. A notice that the policy was not evaluated does not qualify.
+
+| Tracking
+| #99 and #105 (the exemption is the recorded decision for the live half).
+|===

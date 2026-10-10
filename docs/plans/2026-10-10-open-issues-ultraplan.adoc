@@ -1,0 +1,486 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Ultraplan: open issues #99 and #105 (closed #108)
+:toc: preamble
+:sectnums:
+
+* Status: *draft for owner review*. Nothing in this plan has been executed. No issue has been closed and no pin, lock, ruleset or secret has been changed.
+* Date: 2026-10-10
+* Branch: `arena/70f49794-julia-professional-registry` (from `main` @ `449703f`)
+* Scope: `hyperpolymath/julia-professional-registry` issues #99 and #105 (open), #108 (closed, verified).
+* Binding inputs read: `hyperpolymath/standards` (`.claude/CLAUDE.md`, `AGENTS.adoc`, `0-canon/constitution/*`, `docs/decisions/ADR-008-*`, `governance-reusable.yml`, `scripts/*`) and `hyperpolymath/rsr-template-repo` (`CLAUDE.md`, `archetypes/README.adoc`, `.github/workflows/*`).
+
+== Summary
+
+. *#99 and #105 share one root cause.* This repo's `governance.yml` pins the reusable `governance-reusable.yml` at standards commit `84355587` (2026-08-27), 467 commits behind standards `main`. That commit predates two fixes: the self-supplied lock verifier and the split of the credentialed live-policy check. Both reds come from the old pin. The cure is a deliberate pin bump, not per-check edits.
+. *A naive bump to standards HEAD is not safe today.* HEAD adds a strict UUIDv8 gate (`UUID v7 conformance`, ruling D320). It currently fails on *266* literals in this repo. 21 registered package UUIDs and the registry's own UUID need an owner decision. 208 are dependency bindings that the gate has no exemption for, which is a standards-side gap.
+. *The minimal safe bump is `ed5e3f65`*, the commit that standards issue #993 names as the cure. It carries the fixes and predates the UUID gate. Two residual items remain: 7 floating `ref: main` checkouts inside that pin, and a live Actions-policy check that is advisory when no credential is supplied. Both need recorded determinations.
+. *#99's Guix check is already green on `main`.* It needs a recorded "fixed on main" determination and no code change.
+. *The live-policy check cannot be made fully blocking with the current secret model.* At `ed5e3f65` the live step exits with its own code when a credential is supplied, but exits 0 with a notice if the credential cannot read the Administration endpoint, and exits 0 with a notice when no credential is supplied. That is the "advisory" behaviour the owner has to accept or reject (D2).
+. *#108 is closed and verified*, but its recurrence criterion is unmet. The lock gate is not a required check on `main`.
+. *Binding-compliance debt is large and separate from these issues.* It includes 28 tracked retired `.a2ml` files, no `rsr-template-repo`-style `<repo>_chora.deed`, no `.k9.ncl` contracts, and a stale `copilot-instructions.md` that contradicts current bans. It should become its own track and must not be folded into the CI fix.
+
+== The issues
+
+[cols="1,1,3,2",options="header"]
+|===
+| Issue | State | Ask | Status after recon
+
+| #99 `Triage: 3 pre-existing red checks surfaced by the actions.lock cure`
+| open
+| Each of 3 checks needs a recorded determination (fix / retire / exempt). Nothing may be muted.
+| Allowlist Preflight: red on `main`, fixable by pin bump plus a recorded decision on the live half. Guix: green on `main`, record "fixed on main". Workflow security linter: red on `main`, fixable by pin bump.
+
+| #105 `CI: governance linter calls a missing scripts/update-actions-lock.sh; Allowlist Preflight runs with an empty GH_TOKEN`
+| open
+| Linter must stop calling a missing repo-relative script. Allowlist must get a usable token or report `neutral` with a reason.
+| Root cause confirmed in the pinned reusable (see <<evidence-pin>>). Pin bump removes the missing-script call. The token half needs owner decision D2.
+
+| #108 `CI: actions.lock out of sync after Dependabot #106 bumped smtp-notify-action to v0.5.0`
+| closed 2026-10-09 (fixed by PR #112)
+| Lock names `smtp-notify-action@v0.5.0` with the tag's commit. Regenerated, not hand-edited. Recurrence recorded.
+| Lock entry verified: `v0.5.0` is an annotated tag resolving to commit `c1c9fa07…`, which matches `actions.lock`. Lock Sync Gate green on `main` (run 37925049775). The recurrence criterion is *not* verified (see <<d5>>).
+|===
+
+[[evidence-pin]]
+== Recon evidence
+
+=== CI state on `main` (latest push run 37925051409, 2026-10-09, SMTLib #113)
+
+Job and step conclusions were read through the GitHub REST API (`actions/runs/37925051409/jobs`). The raw job logs were not fetched.
+
+[cols="3,1,3",options="header"]
+|===
+| Job | Conclusion | Failing step
+
+| `governance / Allowlist Preflight`
+| failure
+| `Check live Actions policy` (tree allowlist step passed)
+
+| `governance / Workflow security linter`
+| failure
+| `Check SHA-pinned actions` (later steps skipped)
+
+| `governance / Guix packaging policy (Nix retired)`
+| success
+| none
+
+| `Lock Sync Gate` (`actions.lock is in sync with the workflow YAML`)
+| success
+| none
+|===
+
+=== Why the linter fails (pinned reusable `84355587`)
+
+At the pinned commit, the `workflow-lint` job runs `bash scripts/update-actions-lock.sh --verify-local` from the *caller's* repository root (lines 1127–1128 of that file). This repo does not ship that script, so the step exits 127. That is #105's first defect. Standards issue #930 describes the same class: the remedy text names a repo-relative path. At `ed5e3f65` the `workflow-lint` job no longer makes that call. The lock check moved to a separate `actions-lock-verify` job, which copies `check-actions-lock-gate.sh` and `update-actions-lock.sh` from standards (lines 1233–1296). The defect is therefore gone at both candidate pins.
+
+=== Why the allowlist fails (pinned reusable `84355587`)
+
+The `allowlist-preflight` job performs the live Actions-policy check with `GH_TOKEN: secrets.HYPATIA_SCAN_PAT`. This repo cannot read that secret, which I could not verify because the integration token is refused (HTTP 403 on the secrets and variables endpoints). The check therefore fails with an empty token. This is #105's second defect.
+
+=== Candidate pins compared
+
+Standards commits checked with `git show <sha>:.github/workflows/governance-reusable.yml`.
+
+[cols="2,1,1,1,1,1,3",options="header"]
+|===
+| Pin | Date | Lock-verify fix (#993) | Live check split | UUID strict job | Floating `ref: main` | Verdict
+
+| `84355587` (this repo today)
+| 08-27
+| no
+| no
+| no
+| 11
+| Current cause of both reds.
+
+| `da2c748` (rsr-template-repo pin)
+| 09-10
+| no (`is_advisory_category` absent)
+| yes
+| no
+| 8
+| Template itself carries the #993 landmine. Flag to the template owner.
+
+| `f428562b` (newest pre-UUID)
+| 09-29
+| yes
+| yes
+| no
+| 7
+| Viable alternative to `ed5e3f65`. Not verified.
+
+| `ed5e3f65` (named in #993 AC3)
+| 09-22
+| yes
+| yes
+| no
+| 7
+| *Recommended Phase 1 target.*
+
+| `3108c1b0` (standards HEAD)
+| 10-10
+| yes
+| yes
+| *yes (strict v8)*
+| 0
+| Long-term default, but adds a new red today. Gated on D3.
+|===
+
+Between `ed5e3f65` and HEAD, the reusable also changes from floating `ref: main` to `job.workflow_sha` checkouts. That is a real supply-chain improvement and is why HEAD is the long-term target.
+
+=== Required-check reality on `main`
+
+Branch protection (classic) returns HTTP 403, so the exact required set cannot be read from here. The repo rulesets show:
+
+* `Secret-Scan-Floor` (active): requires only `scan / gitleaks`.
+* `Optimus-Branch` (*disabled*): lists `governance / Code quality + docs`, `CodeQL`, `CodeRabbit`, `GitGuardian` and `scan / gitleaks`. It does not list the governance linter, the allowlist, or the lock gate.
+
+Consequence: the red governance checks on `main` do not block merges today. That is why #108's recurrence criterion depends on a decision (<<d5>>).
+
+=== Simulation against standards gates
+
+I copied the repo to a scratch directory outside the workspace and ran standards scripts at the candidate commits. The repo itself was not modified.
+
+[cols="3,2,4",options="header"]
+|===
+| Gate | Standards commit | Result
+
+| `check-allowed-actions.sh` (tree allowlist)
+| `ed5e3f65`, HEAD
+| pass: 12 `uses:` refs, 0 uncovered
+
+| `check-workflow-duplicate-keys.sh`
+| HEAD
+| pass: 13 workflow files clean
+
+| `check-package-policy.sh`
+| HEAD
+| pass: no packaging capability declared
+
+| `check-workflow-staleness.sh`
+| HEAD
+| pass; advisory notice that the pin is 467 commits behind
+
+| `check-trusted-base.sh`, `check-licence-consistency.sh`, `check-docs-presence.sh`, `check-launcher-standard-currency.sh`
+| HEAD
+| all pass
+
+| `check-uuid-v8.sh --strict` (new job at HEAD)
+| HEAD
+| *FAIL: 266 non-v8 literals* (breakdown in <<uuid>>)
+
+| Security-policy greps (weak crypto, HTTP, secrets, tooling, R5b)
+| HEAD
+| replayed by hand: no hits. The `http://` in `boj-build.yml` is not matched by the gate's regex (see <<track-b>>).
+
+| `check-action-pins-resolve.sh`
+| HEAD
+| *not run*: needs `yq`, which is not installed here. At `ed5e3f65` and HEAD it is a step in the `workflow-lint` job, so it is new exposure after the bump. Whether the CI runner has `yq` is not verified.
+
+| `check-actions-lock-gate.sh` / `gh actions-lock --verify-local`
+| any
+| *not run*: the `gh-actions-lock` extension binary cannot be downloaded from this sandbox (release host blocked). The lock must be regenerated where the extension installs.
+
+| `check-lock-sync.sh` (repo copy)
+| local
+| *not run*: needs `gawk`, not installed. The CI gate is green on `main`.
+|===
+
+[[uuid]]
+=== UUID breakdown (the D320 blocker)
+
+[cols="2,1,4",options="header"]
+|===
+| Location | Count | Reading
+
+| `Deps.toml` (154) + `WeakDeps.toml` (54)
+| 208
+| Dependency UUID bindings. Most are General-registry dependencies (e.g. `JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"` in `V/ViperPkg/Deps.toml`). The standards checker exempts the same bindings in `Project.toml` `[deps]`/`[weakdeps]`/`[extras]` on the external-identifier rule, but not in registry `Deps.toml`. This is a standards gap, not a repo defect.
+
+| `Registry.toml` (22)
+| 22
+| 21 registered package UUIDs plus the registry's own top-level `uuid`. Owner question under the ADR-008 D320 amendment: a Julia package's own `uuid` is re-minted as v8 "where the package is not registered in General". (<<d3>>)
+
+| `Package.toml` (21)
+| 21
+| The same 21 package UUIDs, as each package's identity. Same owner question.
+
+| `docs/decisions/0002-…adoc` (13), `CHANGELOG.adoc` (1), `EXPLAINME.adoc` (1)
+| 15
+| Historical records that name retired placeholder UUIDs. The checker cannot be told these are legacy identifiers. Needs a standards-side mechanism; do not edit history.
+|===
+
+ADR-0002 is marked "proposed", but its ten placeholder UUIDs are already re-minted in `Registry.toml` (PR #107 merged 2026-10-09). The status line is stale.
+
+[[constraints]]
+== Binding constraints
+
+These are the rules every step below must satisfy. Each row names its source.
+
+[cols="3,4",options="header"]
+|===
+| Rule | Source
+
+| Repair or retire. Never mute. No `continue-on-error`, no demotion to warning, no removal from the required set without a recorded determination.
+| #99 acceptance criteria; standards #994 AC5; template `CLAUDE.md` doctrine 5 ("reach green by satisfying the gate, never by admin-override")
+
+| `actions.lock` is machine-generated. Never hand-edit. Regenerate with `gh actions-lock --no-narrow`, check with `--no-fix`. Bare `gh actions-lock` fix mode de-pins SHA refs to tags.
+| `actions.lock` header; standards #930 (caveat, marid#36); template `archetypes/README.adoc` ("regenerate in the same PR as any `uses:` change")
+
+| Standards pins are immutable 40-hex SHAs that must be ancestors of standards `main`. Use `propagate-workflow-pins.sh` for bumps; it does not touch the lock.
+| `.github/copilot-instructions.md` (Workflow Pins); `scripts/propagate-workflow-pins.sh`; `scripts/check-action-pins-resolve.sh`
+
+| A2ML is retired. Never create, restore or extend a `.a2ml`. Existing files are legacy: you may delete content, never add facts.
+| standards `AGENTS.adoc`; `.claude/CLAUDE.md` Machine-Readable Artefacts; template `CLAUDE.md`
+
+| Repo metadata is `<repo>_chora.deed`; contracts are `*.k9.ncl`; coordination is `coordination.k9`.
+| standards `.claude/CLAUDE.md`
+
+| UUIDs are UUIDv8 for new identifiers (ADR-008; D320 strict). Do not rewrite existing v4/v7 identifiers by hand; migration is per repo. In deed files, use `#u5` literals until the deed ABNF admits v8; `#u7` is illegal.
+| `docs/decisions/ADR-008-uuid-v8-estate-standard.adoc` (D320 amendment); template `CLAUDE.md` UUIDv8 section (ruling D305)
+
+| No bulk SPDX sweeps. Licence-drift findings are flag-only. No licence edits without owner approval.
+| standards `.claude/CLAUDE.md` License Policy (hard rules)
+
+| Language policy as stated in standards `.claude/CLAUDE.md` (Deno banned 2026-09-22; Bun is tier 1). The language-policy job has not been run against this repo.
+| standards `.claude/CLAUDE.md` Language Policy
+
+| Workflows are not converted to another format in this plan. The KYAML check has not been run against this repo.
+| Scope decision for this plan
+
+| Do not chase "Unverified" commit signatures in agent environments.
+| standards `.claude/CLAUDE.md` "Commit Signing in Agent Environments". The template `CLAUDE.md` Doctrine 9 says "Always sign". Unresolved tension, see D6.
+
+| Stop before actions that are costly to undo or outward-facing (re-minting permanent UUIDs, filing upstream issues, changing rulesets or secrets).
+| template `CLAUDE.md` doctrine 11
+|===
+
+== Owner decisions needed
+
+Each option is labelled. Where I depart from the most elegant long-term option, I say why.
+
+[[d1]]
+=== D1. Phase 1 pin target
+
+* *A. `ed5e3f65`* (recommended for Phase 1). Fixes both reds, predates the UUID gate, and keeps the blast radius to two checks. Departs from the long-term default because it keeps 7 floating `ref: main` checkouts for now.
+* *B. `3108c1b0` (HEAD)* (elegant long-term default). Removes floating refs and is the value `copilot-instructions.md` asks for. It adds a strict UUID red today, so it waits on D3.
+* *C. `f428562b`*. Newest pre-UUID pin. Equivalent to A for this repo, unverified beyond the simulation above.
+
+[[d2]]
+=== D2. Live Actions-policy check (#99 Allowlist half, #105 token half)
+
+* *A. Provision `HYPATIA_SCAN_PAT`* as a repository secret: a token that can read the repository's Administration endpoints. Owner action only. Explicitly map `HYPATIA_SCAN_PAT: ${{ secrets.HYPATIA_SCAN_PAT }}` under `jobs.governance.secrets` in the caller workflow (`.github/workflows/governance.yml`). Only consider the live check evaluated after that mapping is present and a `main` run confirms the policy was read. It still exits 0 with a notice if the token cannot read Administration; that case remains not evaluated. This is the elegant target.
+* *B. Accept as a documented exemption now* (recommended until A is done). Record in the repo: the reason, that the tree allowlist still runs and blocks, and a review date (suggest 2026-11-10). Also record in #99 that the live half is advisory by standards design, not silently passing.
+
+Neither option is a silent pass. Neither should be a continue-on-error.
+
+[[d3]]
+=== D3. UUID scope under D320
+
+* *A. Re-mint* the 21 registered package UUIDs and the registry UUID as UUIDv8, each re-registered at a patch bump as ADR-0002 did for the placeholders. Breaking for existing installs. Needs an ADR, and it does not auto-merge under the registry policy.
+* *B. Keep them*, recording an owner ruling that a registry is not a package and that these identifiers are external or pre-D320 legacy. Needs the standards checker to carry that exception.
+* *C. Defer the strict gate*: stay on `ed5e3f65` (Phase 1) and do not adopt HEAD until A or B is ruled.
+
+Until D3 is decided, the strict UUID gate cannot go green for this repo, so HEAD (D1-B) cannot be adopted without a new, unexplained red.
+
+[[d4]]
+=== D4. Standards-side fixes (upstream issues)
+
+Proposed for the owner to approve before anything is filed:
+
+. `check-uuid-v8.sh` should exempt registry `Deps.toml` and `WeakDeps.toml` dependency bindings, matching its own `Project.toml` rule.
+. The checker needs a documented way to type historical or legacy identifiers, so ADRs and changelogs are not forced to be edited.
+. The rsr-template-repo's `governance` pin (`da2c748`) should be repointed to a pin containing `is_advisory_category` (standards #993 AC3).
+
+These follow "solutions at source": fix the canonical gate, not this repo.
+
+[[d5]]
+=== D5. Recurrence control for #108 (lock drift)
+
+* *A. Make the lock gate required on `main`*: add `governance / Actions lockfile verify` (or the Lock Sync Gate) to an active ruleset. This is the enforcing option, and it means a Dependabot bump cannot merge with a stale lock.
+* *B. Confirm the estate `dependabot-lock-regen` App is installed on this repo*. `regen-dependabot-locks.sh` notes that the bump PR is otherwise merged anyway, so this is the only other path. Owner to confirm.
+
+Either way, #108's acceptance criterion 4 ("record which") needs a recorded answer.
+
+[[d6]]
+=== D6. Format and signing tensions to rule on (not to act on)
+
+* `.md` vs `.adoc`: standards `CLAUDE.md` lists `CHANGELOG.md`, `SECURITY.md` and `CODE_OF_CONDUCT.md` as GitHub-required Markdown. This repo and the template both ship `.adoc` versions (the template ships `CHANGELOG.adoc`). Which governs?
+* `coordination.k9`: standards `AGENTS.adoc` names `coordination.k9` (first line `K9!`). The template ships `coordination.k9.ncl`. Which is canonical?
+* Commit signing: standards says do not chase "Unverified"; template says "Always sign". Which applies to agent commits here?
+
+== The ultraplan
+
+=== Phase 0. Record determinations (no mutation)
+
+Related tracking: standards #968 (lock desync, dead CI), #993 (lock policy and the pin bump that disarms the blocker), #994 (cross-cutting governance reds, AC5 forbids `continue-on-error`), #930 (remedy text names a missing path), and #1070 (umbrella of per-repo triages).
+
+. Post a determination comment on #99 for each of the three checks, using the table in <<issue-determinations>>. Do not close #99 yet.
+. Comment on #105 mapping each acceptance criterion to the Phase 1 change and the D2 decision.
+. Leave #108 closed. Add a comment recording the verified lock entry and the D5 recurrence question.
+
+Gate: owner has seen D1 to D5.
+
+=== Phase 1. Pin bump, governance reusable only
+
+Scope: `governance.yml` and `.github/workflows/actions.lock`. Nothing else.
+
+. Bump the governance `uses:` to the D1 target. The estate tool is `scripts/propagate-workflow-pins.sh --fix --to <sha>`. It rewrites *every* standards reusable pin in the repo, so either run it and revert the other four lines, or edit the single line. Option (recommended): single-line edit, so `hypatia-scan`, `scorecard`, `secret-scanner` and `mirror` stay unchanged.
+. Regenerate the lock in an environment where the `gh-actions-lock` extension installs: `gh actions-lock --no-narrow`, then `gh actions-lock --no-fix`. Review the diff. It must change only the governance entry and its transitive `uses:` records. No `uses:` line other than the governance pin may change.
+. `git diff --check`. Re-run the simulation gates against the new tree.
+. Apply D2 (B until A is available): record the exemption in the repo's docs with reason and review date.
+. Open a PR. Do not use `continue-on-error`.
+
+Expected governance jobs after the change:
+
+[cols="3,2,3",options="header"]
+|===
+| Job / check context | Expected | Why
+
+| `Allowlist Preflight`
+| success
+| Tree allowlist only. Live check moved to the advisory job at this pin.
+
+| `Live Actions policy (credentialed advisory)`
+| success (notice)
+| Without `HYPATIA_SCAN_PAT` it emits "Live Actions policy was not evaluated" as a `::notice` and exits 0. Per D2 this is recorded, not hidden.
+
+| `Workflow security linter`
+| success
+| Missing-script call removed. Duplicate keys, SPDX/permissions and pins-resolve are in this job.
+
+| `Actions lockfile verify` (new context)
+| success
+| Self-supplied verifier from standards. A new check context; add it to the D5 decision.
+
+| `Guix packaging policy (Nix retired)`
+| success
+| Unchanged.
+
+| `Validate Hypatia Baseline`
+| success
+| Unchanged by the bump. It was already green on `main`.
+|===
+
+Verification: confirm each row with step-level REST reads (`gh api repos/.../actions/runs/<id>/jobs`), as done for recon. Logs may be readable from a browser where the sandbox cannot reach them.
+
+=== Phase 2. Close #99 and #105
+
+Close each only when its acceptance criteria are met on a run of `main` after the Phase 1 merge:
+
+* #99: every check has a recorded determination; the two fixed checks are green on `main`; the Guix record says "already green on main"; the exemption is written down.
+* #105: linter green; allowlist green or neutral with the reason recorded.
+
+=== Phase 3. UUID track (blocked on D3)
+
+. Update ADR-0002 status to accepted (implemented by PR #107). Docs-only PR.
+. Under D3-A: draft ADR-0004 for the 21 package and 1 registry re-mints, with the same patch-bump and re-registration method as ADR-0002, and BDFL review. Under D3-B: draft the ruling and request the standards exception (D4-1, D4-2).
+. Raise the standards issues in D4 only after owner approval.
+. Then move the pin to HEAD (D1-B) in a separate PR, once the UUID gate is green or excepted by ruling.
+
+=== Phase 4. Track B: binding-compliance debt (separate PRs, not part of the CI fix)
+
+[[track-b]]
+[cols="1,4,2",options="header"]
+|===
+| Item | Finding | Action
+
+| B1 `.a2ml` files
+| 28 tracked `.a2ml` files, including `0-AI-MANIFEST.a2ml`, `.machine_readable/6a2/*` and `contractiles/*`. Retired format.
+| Map content through `1-formats/deed/mappings/` (not yet read in detail; next recon step). Do not add facts to any `.a2ml`.
+
+| B2 `copilot-instructions.md`
+| Says "No Node.js / npm / bun (use Deno)", which is inverted. Says to create `STATE.a2ml` under `.machine_readable/6a2/`, which is retired.
+| Rewrite to match the current bans (Bun tier 1; Deno banned 2026-09-22; A2ML retired; deed/k9 paths).
+
+| B3 `<repo>_chora.deed`
+| Missing. The template ships `rsr-template-repo_chora.deed` as the worked model, and its `.github/workflows/deed-validate.yml` and `scripts/deed-field.sh` as tooling.
+| Create from the mappings in `standards/1-formats/deed/mappings/`. Grammar: `standards/1-formats/deed/spec/abnf/deed.abnf`. Use `#u5` UUID literals (see <<constraints>>). Validate with the template's deed workflow.
+
+| B4 `*.k9.ncl` contracts and `coordination.k9`
+| Missing. The repo's `contractiles/` holds `.a2ml` files, which are legacy.
+| Create per `standards/1-formats/k9/`. Standards `AGENTS.adoc` names `coordination.k9`, while the template ships `coordination.k9.ncl`. Resolve D6 first.
+
+| B5 `Mustfile`
+| No `Mustfile` in the repo. Standards `.claude/CLAUDE.md` names "Mustfile/justfile" and describes `Mustfile` as the mandatory-checks definition. The template itself ships only a `Justfile`.
+| Owner ruling: whether `Justfile` satisfies this, or a root `Mustfile` is required. Not gated today.
+
+| B6 `http://` in `boj-build.yml`
+| Line 19 contains a plain `http://boj-server.local:7700` URL. This conflicts with the HTTPS-only rule. The gate's regex does not catch it.
+| Owner decision: confirm the internal endpoint and move to HTTPS if it supports it.
+
+| B7 CodeQL comment drift
+| `codeql.yml` says `# v4.38.0`. The locked SHA `2892aa5e` is tag `v4.38.2`, and the lock records `v4.38.2` correctly. Dependabot still holds `github/codeql-action` at 4.38.0.
+| Fix the comment. Owner decides whether to lift the hold (`v4.38.3` exists).
+
+| B8 SPDX headers
+| About 199 tracked text files have no SPDX line in their first five lines. Most are registry `Package.toml`, `Deps.toml` and `Versions.toml` files.
+| Per-file, manual, owner-approved. No bulk sweep (licence policy). Registry metadata may need a ruling on whether headers apply.
+
+| B9 Doc format
+| `CHANGELOG.adoc`, `SECURITY.adoc`, `CODE_OF_CONDUCT.adoc` at the root. Standards lists `.md` for three of them.
+| Resolve D6, then align.
+
+| B10 Template pin
+| `rsr-template-repo` pins `da2c748`, which lacks the #993 fix. Every new mint inherits it.
+| Flag to the template owner (D4-3).
+|===
+
+== Risks
+
+[cols="3,3,4",options="header"]
+|===
+| Risk | Likelihood | Mitigation
+
+| Someone pins HEAD before D3 and gets a new red, or "fixes" it by exempting the UUID job
+| medium
+| Do not adopt HEAD until D3. Exemptions live in standards, not here.
+
+| `gh actions-lock` in fix mode de-pins the CodeQL SHA to a tag
+| medium
+| Use `--no-narrow` and `--no-fix` only. Review the lock diff for any `uses:` change outside the governance pin.
+
+| The live-check exemption (D2-B) is read as "silently passing"
+| medium
+| Record the reason and review date in-repo and in #99. Keep the step's notice in the run summary.
+
+| Standards `main` changes under floating `ref: main` at the Phase 1 pin
+| low–medium
+| Known debt. Removed when the pin moves to HEAD (D1-B).
+
+| Lock regeneration cannot run in this sandbox
+| certain
+| Run it where the extension installs, or in CI with the extension. Do not hand-edit the lock.
+
+| Mixed pins across the four standards reusables
+| low
+| Acceptable under the staleness gate (advisory). Track as follow-up.
+|===
+
+[[issue-determinations]]
+== Proposed determinations for #99
+
+[cols="3,2,5",options="header"]
+|===
+| Check | Determination | Record
+
+| `governance / Allowlist Preflight`
+| fixed (pin bump), with the live half accepted by exemption until D2-A
+| Red on `main` (run 37925051409). Tree allowlist green after Phase 1. Live half recorded per D2.
+
+| `governance / Guix packaging policy (Nix retired)`
+| fixed on main (no change required)
+| Green on `main` (run 37925051409). Not red on `main`, so nothing is required of the branch. Re-verify after the pin bump.
+
+| `governance / Workflow security linter`
+| fixed (pin bump)
+| Red on `main` (run 37925051409, step `Check SHA-pinned actions`). Missing-script call removed; self-supplied verifier at the new pin.
+|===
+
+== What I did not do
+
+* No commits, pushes, PRs, issue comments, ruleset or secret changes, or lock edits.
+* Did not install or run `gh-actions-lock`, `yq`, `gawk`, `bun` or `julia`. Those were not available or not downloadable from this sandbox.
+* Did not read the full `1-formats/deed/mappings/` set or the k9 spec. Those are the next recon step for Track B.
+* The local clone is shallow. History was read through the GitHub API.

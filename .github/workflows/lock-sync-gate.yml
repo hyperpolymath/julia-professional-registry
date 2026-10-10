@@ -23,6 +23,10 @@ on:
   pull_request:
   push:
     branches: [main]
+  # Manual only: regenerates actions.lock on the dispatched branch (see the
+  # regenerate-lock job). Added so the lock can be rebuilt by CI when the
+  # gh-actions-lock extension cannot be installed from a developer machine.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -61,3 +65,84 @@ jobs:
           test -x scripts/check-lock-sync.sh \
             || { echo "::error::scripts/check-lock-sync.sh missing or not executable"; exit 1; }
           ./scripts/check-lock-sync.sh
+
+  regenerate-lock:
+    name: Regenerate actions.lock (manual)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the dispatched branch without actions/checkout
+        env:
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref_name }}
+          TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          AUTH="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${TOKEN}" | base64 -w0)"
+          git init -q .
+          git remote add origin "https://github.com/${REPO}.git"
+          git -c http.extraheader="${AUTH}" fetch -q --depth 1 origin "${REF}"
+          git checkout -q FETCH_HEAD
+          echo "checked out ${REF} at $(git rev-parse HEAD)"
+
+      - name: Install gh-actions-lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh extension install github/gh-actions-lock --pin v0.1.6
+
+      - name: Regenerate and verify the lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Never bare `gh actions-lock` in fix mode: it de-pins SHA refs to tags.
+          gh actions-lock --no-narrow
+          gh actions-lock --no-fix
+          git status --short
+
+      - name: Commit the regenerated lock to the dispatched branch
+        env:
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref_name }}
+          # Use a signing-capable credential with workflow write access, e.g.
+          # a classic PAT with repo and workflow scopes. GITHUB_TOKEN cannot
+          # update workflow files. GitHub signs the API-created commit.
+          GH_TOKEN: ${{ secrets.LOCK_SYNC_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain -- .github/workflows)" ]; then
+            echo "actions.lock already in sync; nothing to commit."
+            exit 0
+          fi
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "::error::LOCK_SYNC_TOKEN must support signed API commits and have permission to update workflow files."
+            exit 1
+          fi
+          git add -- .github/workflows
+          CHANGES="$(git diff --cached --name-status --no-renames -z HEAD -- .github/workflows |
+            while IFS= read -r -d '' status && IFS= read -r -d '' path; do
+              if [ "${status}" = D ]; then
+                jq -n --arg path "${path}" '{deletion: {path: $path}}'
+              else
+                contents="$(git show ":${path}" | base64 -w0)" || exit 1
+                jq -n --arg path "${path}" --arg contents "${contents}" \
+                  '{addition: {path: $path, contents: $contents}}'
+              fi
+            done | jq -s '{additions: map(.addition // empty), deletions: map(.deletion // empty)}')"
+          PAYLOAD="$(mktemp)"
+          trap 'rm -f "${PAYLOAD}"' EXIT
+          jq -n --arg repo "${REPO}" --arg branch "${REF}" \
+            --arg head "$(git rev-parse HEAD)" --argjson changes "${CHANGES}" \
+            '{query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { url } } }",
+              variables: {input: {branch: {repositoryNameWithOwner: $repo, branchName: $branch},
+                expectedHeadOid: $head,
+                message: {headline: "chore(ci): regenerate actions.lock via gh actions-lock"},
+                fileChanges: $changes}}}' > "${PAYLOAD}"
+          # expectedHeadOid rejects a branch that moved since checkout atomically.
+          if ! gh api graphql --input "${PAYLOAD}" --jq '.data.createCommitOnBranch.commit.url'; then
+            echo "::error::Could not commit regenerated workflows. If the dispatched branch moved since checkout, expectedHeadOid rejects the update; dispatch a new run. No retry or rebase was attempted. See the API error above for other causes."
+            exit 1
+          fi
