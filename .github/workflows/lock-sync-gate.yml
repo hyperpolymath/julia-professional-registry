@@ -110,7 +110,7 @@ jobs:
           TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if git diff --quiet -- .github/workflows; then
+          if [ -z "$(git status --porcelain -- .github/workflows)" ]; then
             echo "actions.lock already in sync; nothing to commit."
             exit 0
           fi
