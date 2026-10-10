@@ -41,8 +41,12 @@ removed from a workflow, demoted to a warning, or marked `continue-on-error`.
 
 | Closure path
 | Provision a token that can read Administration, add it as
-  `HYPATIA_SCAN_PAT`, and confirm the live check evaluates on a `main` run.
-  Then delete this entry.
+  `HYPATIA_SCAN_PAT`, and explicitly map
+  `HYPATIA_SCAN_PAT: ${{ secrets.HYPATIA_SCAN_PAT }}` under
+  `jobs.governance.secrets` in the caller workflow
+  (`.github/workflows/governance.yml`). Only after that mapping is present
+  and a `main` run confirms the live check reads the policy may this entry
+  be deleted. A notice that the policy was not evaluated does not qualify.
 
 | Tracking
 | #99 and #105 (the exemption is the recorded decision for the live half).

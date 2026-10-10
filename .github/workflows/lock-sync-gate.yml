@@ -107,17 +107,42 @@ jobs:
         env:
           REPO: ${{ github.repository }}
           REF: ${{ github.ref_name }}
-          TOKEN: ${{ github.token }}
+          # Use a signing-capable credential with workflow write access, e.g.
+          # a classic PAT with repo and workflow scopes. GITHUB_TOKEN cannot
+          # update workflow files. GitHub signs the API-created commit.
+          GH_TOKEN: ${{ secrets.LOCK_SYNC_TOKEN }}
         run: |
           set -euo pipefail
           if [ -z "$(git status --porcelain -- .github/workflows)" ]; then
             echo "actions.lock already in sync; nothing to commit."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows
-          git commit -q -m "chore(ci): regenerate actions.lock via gh actions-lock"
-          AUTH="AUTHORIZATION: basic $(printf 'x-access-token:%s' "${TOKEN}" | base64 -w0)"
-          git -c http.extraheader="${AUTH}" push origin "HEAD:refs/heads/${REF}"
-          git log --oneline -1
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "::error::LOCK_SYNC_TOKEN must support signed API commits and have permission to update workflow files."
+            exit 1
+          fi
+          git add -- .github/workflows
+          CHANGES="$(git diff --cached --name-status --no-renames -z HEAD -- .github/workflows |
+            while IFS= read -r -d '' status && IFS= read -r -d '' path; do
+              if [ "${status}" = D ]; then
+                jq -n --arg path "${path}" '{deletion: {path: $path}}'
+              else
+                contents="$(git show ":${path}" | base64 -w0)" || exit 1
+                jq -n --arg path "${path}" --arg contents "${contents}" \
+                  '{addition: {path: $path, contents: $contents}}'
+              fi
+            done | jq -s '{additions: map(.addition // empty), deletions: map(.deletion // empty)}')"
+          PAYLOAD="$(mktemp)"
+          trap 'rm -f "${PAYLOAD}"' EXIT
+          jq -n --arg repo "${REPO}" --arg branch "${REF}" \
+            --arg head "$(git rev-parse HEAD)" --argjson changes "${CHANGES}" \
+            '{query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { url } } }",
+              variables: {input: {branch: {repositoryNameWithOwner: $repo, branchName: $branch},
+                expectedHeadOid: $head,
+                message: {headline: "chore(ci): regenerate actions.lock via gh actions-lock"},
+                fileChanges: $changes}}}' > "${PAYLOAD}"
+          # expectedHeadOid rejects a branch that moved since checkout atomically.
+          if ! gh api graphql --input "${PAYLOAD}" --jq '.data.createCommitOnBranch.commit.url'; then
+            echo "::error::Could not commit regenerated workflows. If the dispatched branch moved since checkout, expectedHeadOid rejects the update; dispatch a new run. No retry or rebase was attempted. See the API error above for other causes."
+            exit 1
+          fi

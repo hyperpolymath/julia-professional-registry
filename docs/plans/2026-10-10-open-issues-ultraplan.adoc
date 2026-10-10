@@ -270,7 +270,7 @@ Each option is labelled. Where I depart from the most elegant long-term option, 
 [[d2]]
 === D2. Live Actions-policy check (#99 Allowlist half, #105 token half)
 
-* *A. Provision `HYPATIA_SCAN_PAT`* as a repository secret: a token that can read the repository's Administration endpoints. Owner action only. The live check then evaluates the policy. It still exits 0 with a notice if the token cannot read Administration, so the owner should accept that case too. This is the elegant target.
+* *A. Provision `HYPATIA_SCAN_PAT`* as a repository secret: a token that can read the repository's Administration endpoints. Owner action only. Explicitly map `HYPATIA_SCAN_PAT: ${{ secrets.HYPATIA_SCAN_PAT }}` under `jobs.governance.secrets` in the caller workflow (`.github/workflows/governance.yml`). Only consider the live check evaluated after that mapping is present and a `main` run confirms the policy was read. It still exits 0 with a notice if the token cannot read Administration; that case remains not evaluated. This is the elegant target.
 * *B. Accept as a documented exemption now* (recommended until A is done). Record in the repo: the reason, that the tree allowlist still runs and blocks, and a review date (suggest 2026-11-10). Also record in #99 that the live half is advisory by standards design, not silently passing.
 
 Neither option is a silent pass. Neither should be a continue-on-error.
