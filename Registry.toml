@@ -44,7 +44,7 @@ f1a9a0dc-9df1-4c08-8f01-4f9031796370 = { name = "PostDisciplinary", path = "P/Po
 01a11d29-d88c-832a-9ded-976af4b7dc75 = { name = "SiliconCore", path = "S/SiliconCore" }
 e8a1f3d0-7c42-4e9a-b5d1-3a7f8c2e1d0b = { name = "Skein", path = "S/Skein" }
 cc72cefe-1ea1-4255-93cd-1af1078aa475 = { name = "SoftwareSovereign", path = "S/SoftwareSovereign" }
-28827ff7-c05d-49d1-8ea0-4ff47f2d6875 = { name = "TradeUnionist", path = "T/TradeUnionist" }
+28827ff7-c05d-49d1-8ea0-4ff47f2d6875 = { name = "TradeUnionism", path = "T/TradeUnionism" }
 a6c07668-559f-42e4-88f9-b00ef4c02498 = { name = "ViableSystems", path = "V/ViableSystems" }
 01a11d29-d892-8715-80a7-7aa80ffa7099 = { name = "ViperPkg", path = "V/ViperPkg" }
 01a11d29-d894-81ed-be3f-5f3acc80d59a = { name = "ZeroProb", path = "Z/ZeroProb" }
