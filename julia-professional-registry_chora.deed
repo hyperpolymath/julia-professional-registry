@@ -1,0 +1,30 @@
+;; SPDX-License-Identifier: MPL-2.0
+;; SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+;; julia-professional-registry_chora.deed — the repo deed (standards 1-formats/deed).
+;;
+;; One deed per repo (standards #837, owner ruling 2026-09-19, Option A). This
+;; registry was instantiated from hyperpolymath/rsr-template-repo but never had
+;; the deed/k9 half of that template applied, so it was the outlier among the
+;; 210 estate repos that carry a <repo>_chora.deed. Adding it is a conformance
+;; fix, not a redesign.
+;;
+;; Deliberately MINIMAL, on the same pattern as hyperpolymath/verisimdb's deed
+;; rather than the template's own exhaustive 1100-line record. Two reasons:
+;;   1. An archetype/template-derived record "must not write fiction"
+;;      (rsr-template-repo archetypes/README.adoc) — so no clause appears here
+;;      that cannot be read off a file in this repo.
+;;   2. The (canon) clause pins canon.lock artefact hashes. A guessed pin is
+;;      worse than no pin: standards' check-canon-lockstep.sh compares it
+;;      against canon.lock and a wrong hash is a hard failure. The pin belongs
+;;      in a change that runs that check, not in a conformance commit.
+;;
+;; Read any field with: scripts/deed-field.sh <field>
+;; Grammar: standards 1-formats/deed/spec/abnf/deed.abnf
+(repo-deed
+  :schema-version "1.0.0"
+  :canonical-name "julia-professional-registry"
+  :repo-uuid #u5"github.com/hyperpolymath/julia-professional-registry"
+  (status
+    :present #t
+    :ended #f
+    :note "Hyperpolymath Julia package registry: the estate's own Pkg registry (Registry.toml, uuid 2ba92a00-ca78-4729-9a29-51b4a830c8fa), 41 packages resolved through it by URL in consumer CI."))

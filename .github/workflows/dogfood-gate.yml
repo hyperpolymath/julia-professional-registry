@@ -1,0 +1,90 @@
+# SPDX-License-Identifier: MPL-2.0
+# This workflow is managed by gh actions-lock.
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# dogfood-gate.yml — validates that this repo uses the estate's own formats.
+#
+# Why this repo needs it: it was instantiated from rsr-template-repo but never
+# had the deed/k9 half of that template applied. It had no <repo>_chora.deed and
+# no *.k9.ncl contracts, unlike the 210 estate repos that do. A format nobody
+# checks rots, so the files and this gate land together.
+#
+# Companion to .github/workflows/lock-sync-gate.yml (pin hygiene) and
+# registry-validate.yml (registry correctness) — this one is format conformance
+# in the deed-ecosystem / k9-ecosystem sense.
+#
+# Job shape is copied from hyperpolymath/docudactyl's dogfood-gate.yml, which is
+# the canonical consumer of both validate-actions. Both are composite actions
+# pinned to the current main commit; refs are recorded in actions.lock with
+# ref: 'main' and the pinned SHA in commit:, exactly as that repo does.
+name: Dogfood Gate
+
+on:
+  pull_request:
+    branches: ['**']
+  push:
+    branches: [main, master]
+
+# No workflow-level permissions block: each job declares its own (SonarCloud
+# githubactions:S8264). Neither job reads workflow runs, artifacts or caches,
+# so `contents: read` is the whole requirement -- and per the note in
+# metadatastician/standards' secret-scanner-reusable.yml, a job-level block
+# REPLACES the workflow-level one rather than merging with it.
+jobs:
+  deed-validate:
+    name: Validate DEED manifests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Check for manifest files (.a2ml/.deed)
+        id: detect
+        run: |
+          set -euo pipefail
+          COUNT=$(find . \( -name '*.a2ml' -o -name '*.deed' \) -not -path './.git/*' | wc -l)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "manifest files found: $COUNT"
+          find . \( -name '*.a2ml' -o -name '*.deed' \) -not -path './.git/*' -print
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::No .a2ml/.deed manifest found. Every RSR repo must have a repo deed (<repo>_chora.deed); legacy 0-AI-MANIFEST.a2ml is accepted mid-migration (standards #837)."
+          fi
+
+      - name: Validate DEED manifests
+        if: steps.detect.outputs.count > 0
+        uses: hyperpolymath/deed-ecosystem/validate-action@aa4b836bd969df2bc58128cb8e3d20bbc88d5e79 # main
+        with:
+          path: '.'
+          strict: 'false'
+
+  k9-validate:
+    name: Validate K9 contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Check for K9 contracts
+        id: detect
+        run: |
+          set -euo pipefail
+          COUNT=$(find . \( -name '*.k9' -o -name '*.k9.ncl' \) -not -path './.git/*' | wc -l)
+          echo "k9_count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "k9 contracts found: $COUNT"
+          find . \( -name '*.k9' -o -name '*.k9.ncl' \) -not -path './.git/*' -print
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::No K9 contract found. Every RSR repo must carry at least coordination.k9.ncl (standards 1-formats/k9)."
+          fi
+
+      - name: Validate K9 contracts
+        if: steps.detect.outputs.k9_count > 0
+        uses: hyperpolymath/k9-ecosystem/validate-action@89f3c2702f4f650a92aa7411502f38da06abd562 # main
+        with:
+          path: '.'
+          strict: 'false'
