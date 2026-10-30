@@ -14,4 +14,9 @@ permissions:
 jobs:
   mirror:
     uses: metadatastician/standards/.github/workflows/mirror-reusable.yml@d5fe075a50ab3ce4f41614d66ed77f152fda134f
+    # NOSONAR(githubactions:S7635) — mirror-reusable.yml declares no
+    # `secrets:` block for the per-forge SSH keys and documents `inherit`
+    # as its contract ("Without `secrets: inherit`, ${{ secrets.X }}
+    # inside the reusable evaluates to empty"). Naming them here cannot
+    # work: passing a secret the callee does not declare is a startup error.
     secrets: inherit
