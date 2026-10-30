@@ -9,14 +9,14 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'github/codeql-action@24c54180a607b1449ed407dd24f251e4e9147c8d'
     '.github/workflows/governance.yml':
-        - 'hyperpolymath/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
+        - 'metadatastician/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
     '.github/workflows/hypatia-scan.yml':
-        - 'hyperpolymath/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
+        - 'metadatastician/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
     '.github/workflows/label-triage.yml': []
     '.github/workflows/labels.yml': []
     '.github/workflows/lock-sync-gate.yml': []
     '.github/workflows/mirror.yml':
-        - 'hyperpolymath/standards@d5fe075a50ab3ce4f41614d66ed77f152fda134f'
+        - 'metadatastician/standards@d5fe075a50ab3ce4f41614d66ed77f152fda134f'
     '.github/workflows/pages.yml':
         - 'actions/checkout@v7.0.1'
         - 'actions/deploy-pages@v5.0.1'
@@ -27,9 +27,9 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'julia-actions/setup-julia@v3.0.3'
     '.github/workflows/scorecard.yml':
-        - 'hyperpolymath/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
+        - 'metadatastician/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
     '.github/workflows/secret-scanner.yml':
-        - 'hyperpolymath/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
+        - 'metadatastician/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
 dependencies:
     'actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9':
         ref: '55cc8345863c7cc4c66a329aec7e433d2d1c52a9'
@@ -103,10 +103,15 @@ dependencies:
         commit: 'sha1-c1c9fa07992a02c1fd3d67a0dc1b08cccb852aef'
         owner_id: 6759885
         repo_id: 1352485172
-    'hyperpolymath/standards@84355587cb2a1f86e6882de83514a32db2646e7a':
+    'julia-actions/setup-julia@v3.0.3':
+        ref: 'v3.0.3'
+        commit: 'sha1-da908477b5db94c10ffce8cfea9f2b3b9d5db687'
+        owner_id: 53965732
+        repo_id: 202020219
+    'metadatastician/standards@84355587cb2a1f86e6882de83514a32db2646e7a':
         ref: '84355587cb2a1f86e6882de83514a32db2646e7a'
         commit: 'sha1-84355587cb2a1f86e6882de83514a32db2646e7a'
-        owner_id: 6759885
+        owner_id: 297579217
         repo_id: 1116521501
         uses:
             - 'actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9'
@@ -117,20 +122,15 @@ dependencies:
             - 'erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124'
             - 'github/codeql-action@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28'
             - 'ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc'
-    'hyperpolymath/standards@d5fe075a50ab3ce4f41614d66ed77f152fda134f':
+    'metadatastician/standards@d5fe075a50ab3ce4f41614d66ed77f152fda134f':
         ref: 'd5fe075a50ab3ce4f41614d66ed77f152fda134f'
         commit: 'sha1-d5fe075a50ab3ce4f41614d66ed77f152fda134f'
-        owner_id: 6759885
+        owner_id: 297579217
         repo_id: 1116521501
         uses:
             - 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
             - 'dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772'
             - 'webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555'
-    'julia-actions/setup-julia@v3.0.3':
-        ref: 'v3.0.3'
-        commit: 'sha1-da908477b5db94c10ffce8cfea9f2b3b9d5db687'
-        owner_id: 53965732
-        repo_id: 202020219
     'ossf/scorecard-action@2d1146689b8cda280b9bc96326124645441f03bc':
         ref: '2d1146689b8cda280b9bc96326124645441f03bc'
         commit: 'sha1-2d1146689b8cda280b9bc96326124645441f03bc'
