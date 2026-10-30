@@ -8,6 +8,10 @@ workflows:
     '.github/workflows/codeql.yml':
         - 'actions/checkout@v7.0.1'
         - 'github/codeql-action@24c54180a607b1449ed407dd24f251e4e9147c8d'
+    '.github/workflows/dogfood-gate.yml':
+        - 'actions/checkout@v7.0.1'
+        - 'hyperpolymath/deed-ecosystem@aa4b836bd969df2bc58128cb8e3d20bbc88d5e79'
+        - 'hyperpolymath/k9-ecosystem@89f3c2702f4f650a92aa7411502f38da06abd562'
     '.github/workflows/governance.yml':
         - 'metadatastician/standards@84355587cb2a1f86e6882de83514a32db2646e7a'
     '.github/workflows/hypatia-scan.yml':
@@ -98,6 +102,16 @@ dependencies:
         commit: 'sha1-db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28'
         owner_id: 9919
         repo_id: 259445878
+    'hyperpolymath/deed-ecosystem@aa4b836bd969df2bc58128cb8e3d20bbc88d5e79':
+        ref: 'main'
+        commit: 'sha1-aa4b836bd969df2bc58128cb8e3d20bbc88d5e79'
+        owner_id: 6759885
+        repo_id: 1275649586
+    'hyperpolymath/k9-ecosystem@89f3c2702f4f650a92aa7411502f38da06abd562':
+        ref: 'main'
+        commit: 'sha1-89f3c2702f4f650a92aa7411502f38da06abd562'
+        owner_id: 6759885
+        repo_id: 1275650185
     'hyperpolymath/smtp-notify-action@v0.5.0':
         ref: 'v0.5.0'
         commit: 'sha1-c1c9fa07992a02c1fd3d67a0dc1b08cccb852aef'
