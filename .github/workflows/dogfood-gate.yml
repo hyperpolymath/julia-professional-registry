@@ -25,15 +25,18 @@ on:
   push:
     branches: [main, master]
 
-permissions:
-  actions: read
-  contents: read
-
+# No workflow-level permissions block: each job declares its own (SonarCloud
+# githubactions:S8264). Neither job reads workflow runs, artifacts or caches,
+# so `contents: read` is the whole requirement -- and per the note in
+# metadatastician/standards' secret-scanner-reusable.yml, a job-level block
+# REPLACES the workflow-level one rather than merging with it.
 jobs:
   deed-validate:
     name: Validate DEED manifests
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
@@ -61,6 +64,8 @@ jobs:
     name: Validate K9 contracts
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
