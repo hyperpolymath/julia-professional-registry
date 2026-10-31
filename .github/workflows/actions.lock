@@ -7,7 +7,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
     '.github/workflows/codeql.yml':
         - 'actions/checkout@v7.0.1'
-        - 'github/codeql-action@24c54180a607b1449ed407dd24f251e4e9147c8d'
+        - 'github/codeql-action@9b3254085494b55a0f7c4c2b3d2d52cc712ce370'
     '.github/workflows/dogfood-gate.yml':
         - 'actions/checkout@v7.0.1'
         - 'hyperpolymath/deed-ecosystem@aa4b836bd969df2bc58128cb8e3d20bbc88d5e79'
@@ -26,7 +26,7 @@ workflows:
         - 'actions/deploy-pages@v5.0.1'
         - 'actions/upload-pages-artifact@v5.0.0'
     '.github/workflows/push-email-notify.yml':
-        - 'hyperpolymath/smtp-notify-action@v0.5.0'
+        - 'hyperpolymath/smtp-notify-action@v0.5.1'
     '.github/workflows/registry-validate.yml':
         - 'actions/checkout@v7.0.1'
         - 'julia-actions/setup-julia@v3.0.3'
@@ -92,9 +92,9 @@ dependencies:
         commit: 'sha1-54075bcc5e249e4758d363f27d099f55d843f124'
         owner_id: 47606891
         repo_id: 331103973
-    'github/codeql-action@24c54180a607b1449ed407dd24f251e4e9147c8d':
-        ref: 'v4.38.3'
-        commit: 'sha1-24c54180a607b1449ed407dd24f251e4e9147c8d'
+    'github/codeql-action@9b3254085494b55a0f7c4c2b3d2d52cc712ce370':
+        ref: 'v4.39.1'
+        commit: 'sha1-9b3254085494b55a0f7c4c2b3d2d52cc712ce370'
         owner_id: 9919
         repo_id: 259445878
     'github/codeql-action@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28':
@@ -112,9 +112,9 @@ dependencies:
         commit: 'sha1-89f3c2702f4f650a92aa7411502f38da06abd562'
         owner_id: 6759885
         repo_id: 1275650185
-    'hyperpolymath/smtp-notify-action@v0.5.0':
-        ref: 'v0.5.0'
-        commit: 'sha1-c1c9fa07992a02c1fd3d67a0dc1b08cccb852aef'
+    'hyperpolymath/smtp-notify-action@v0.5.1':
+        ref: 'v0.5.1'
+        commit: 'sha1-e384daf6167a7a7567642d6a62060106244d2413'
         owner_id: 6759885
         repo_id: 1352485172
     'julia-actions/setup-julia@v3.0.3':
