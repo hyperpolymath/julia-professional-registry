@@ -13,5 +13,9 @@ permissions:
   contents: read
 jobs:
   mirror:
-    uses: hyperpolymath/standards/.github/workflows/mirror-reusable.yml@d5fe075a50ab3ce4f41614d66ed77f152fda134f
-    secrets: inherit
+    uses: metadatastician/standards/.github/workflows/mirror-reusable.yml@d5fe075a50ab3ce4f41614d66ed77f152fda134f
+    # mirror-reusable.yml declares no `secrets:` block for the per-forge
+    # SSH keys and documents `inherit` as its contract: without it,
+    # ${{ secrets.X }} inside the reusable evaluates to empty. Naming the
+    # keys here is rejected at startup (the callee does not declare them).
+    secrets: inherit # NOSONAR(githubactions:S7635)
