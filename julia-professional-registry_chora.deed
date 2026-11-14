@@ -23,7 +23,7 @@
 (repo-deed
   :schema-version "1.0.0"
   :canonical-name "julia-professional-registry"
-  :repo-uuid #u5"github.com/hyperpolymath/julia-professional-registry"
+  :repo-uuid #u8"gv-clade-index:github.com/hyperpolymath/julia-professional-registry"
   (status
     :present #t
     :ended #f
