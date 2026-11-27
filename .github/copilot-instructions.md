@@ -24,7 +24,7 @@
 ## Banned Languages (estate-wide)
 
 - No TypeScript (use AffineScript).
-- No Node.js / npm / bun (use Deno).
+- No Node.js / npm (use Bun first).
 - No Go (use Rust).
 - No Python (use Julia or Rust).
 

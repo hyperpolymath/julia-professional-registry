@@ -30,5 +30,6 @@ gnu-grep = "latest"
 # Task runner alias
 [alias]
 task = "go-task"
-build = "cargo build --release"
-test = "cargo test"
+
+[tasks.test]
+run = "just test"
