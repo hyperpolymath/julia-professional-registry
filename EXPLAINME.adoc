@@ -68,7 +68,7 @@ maintenance gap.
 
 [source,bash]
 ----
-deno test --allow-read tests/
+just test
 ----
 
 The test suite in `tests/` validates registry structural invariants:
@@ -139,13 +139,10 @@ secret scanning and EditorConfig enforcement.
 | Weak/optional dependency declarations (present in Axiom; absent elsewhere).
 
 | `tests/`
-| Deno test suite for registry structural validation.
+| Idris2 test suite for registry structural validation (run with `just test`).
 
 | `Justfile`
 | `just` task runner with `default`, `doctor`, `tour`, `help-me` recipes.
-
-| `deno.json` / `deno.lock`
-| Deno runtime config and lockfile.
 
 | `guix.scm` / `flake.nix`
 | Reproducible build environment declarations.

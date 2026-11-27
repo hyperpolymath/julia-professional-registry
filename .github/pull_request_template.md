@@ -15,7 +15,7 @@
 
 ### Required
 
-- [ ] No banned language patterns (no TypeScript, no npm/bun, no Go, no Python)
+- [ ] No banned language patterns (no TypeScript, no Node.js/yarn (Bun first; Deno, pnpm, npm as fallbacks), no Go, no Python)
 - [ ] SPDX license headers present on all new/modified source files
 - [ ] No secrets, credentials, or `.env` files included
 - [ ] CI is green (governance, hypatia-scan, codeql, scorecard, secret-scanner)
