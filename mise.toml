@@ -1,11 +1,8 @@
 [tools]
 # Language runtimes
-rust = "latest"
 zig = "latest"
 
 # Package managers
-pnpm = "latest"
-cargo = "latest"
 go-task = "latest"
 just = "latest"
 
