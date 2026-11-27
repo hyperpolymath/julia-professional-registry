@@ -45,7 +45,7 @@ doc-registry alignment
 
 [source,bash]
 ----
-deno test --allow-read tests/validate.test.ts
+just test
 ----
 
 === Test Details
@@ -142,8 +142,7 @@ pkg> add Lithoglyph
 
 === Dependencies
 
-* Deno 1.40+
-* deno_std (assert module)
+* Idris2 (built via `julia-professional-registry-tests.ipkg`)
 
 === Future Enhancements
 
