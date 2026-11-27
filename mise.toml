@@ -3,7 +3,6 @@
 zig = "latest"
 
 # Package managers
-go-task = "latest"
 just = "latest"
 
 # Formatting & Linting
@@ -24,10 +23,6 @@ gnu-grep = "latest"
 
 [env]
 # Common environment variables
-
-# Task runner alias
-[alias]
-task = "go-task"
 
 [tasks.test]
 run = "just test"
